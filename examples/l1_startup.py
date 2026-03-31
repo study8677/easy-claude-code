@@ -1,15 +1,22 @@
 """
 Layer 1 — 启动与入口
 对应源码：claudecode_src/src/main.tsx + entrypoints/ + setup.ts
+配套深挖：
+  - 中文：docs/layers/l1-startup.md
+  - English: docs/layers/l1-startup.en.md
 
 核心问题：`claude` 命令敲下去之后，真正发生了什么？
 
-答：Claude Code 在启动时做三件事：
+你会看到：
   1. headlessProfilerCheckpoint() 打时间戳，追踪每个启动阶段耗时
   2. setup.ts 检测工作目录、API Key、权限模式，建立 session_id
   3. entrypoints/ 根据命令行参数分流到不同模式
 
 这个文件是简化版演示，无需 API Key 即可运行。
+
+运行后请回答：
+  - 启动路径和 query 路径是在什么地方接起来的？
+  - 为什么模式分流要发生在真正进入 Agent Loop 之前？
 """
 
 import sys

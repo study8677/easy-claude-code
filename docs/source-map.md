@@ -141,8 +141,18 @@
 5. `memdir/memdir.ts`
 6. `coordinatorMode.ts`
 
-## 8. 搭配阅读
+## 8. 进阶深挖专题
+
+- [L10 QueryEngine 与系统 Prompt 拼装](./layers/l10-query-engine.md)
+- [L11 API Streaming 与事件模型](./layers/l11-api-streaming.md)
+- [L12 REPL 主界面与输入系统](./layers/l12-repl-ui.md)
+- [L13 MCP / Hooks / Plugins 扩展面](./layers/l13-mcp-hooks-plugins.md)
+- [L14 Memory 提取与 Team Memory](./layers/l14-memory-system.md)
+- [L15 Print / Serve / Bridge 等运行模式](./layers/l15-runtime-modes.md)
+
+## 9. 搭配阅读
 
 - 哲学总结：[`../PHILOSOPHY.MD`](../PHILOSOPHY.MD)
+- 导航手册：[`source-navigation.md`](./source-navigation.md)
 - 文章路线：[`articles/series.md`](./articles/series.md)
 - Layer 文档：[`layers/README.md`](./layers/README.md)

@@ -3,10 +3,13 @@ Layer 9 — Context Window 管理 & Auto-Compact
 对应源码：claudecode_src/src/utils/context.ts
          claudecode_src/src/query.ts（auto-compact 逻辑）
          claudecode_src/src/commands/compact.ts
+配套深挖：
+  - 中文：docs/layers/l9-context.md
+  - English: docs/layers/l9-context.en.md
 
 核心问题：Claude Code 如何在超长对话中不爆 context window？
 
-答：三道防线——
+你会看到：三道防线——
 
   1. Token 预算监控
      每次 API 调用后检查：已用 token / 窗口上限。
@@ -26,6 +29,10 @@ Layer 9 — Context Window 管理 & Auto-Compact
     这个分界线最大化了 Claude 的 prompt cache 命中率（节省 50~70K token）。
 
 无需 API Key 即可运行（演示逻辑；注释掉的代码展示真实实现方式）
+
+运行后请回答：
+  - auto-compact 和 memory index 分别解决什么问题？
+  - 为什么 prompt cache 命中率会反过来影响架构？
 """
 
 import os

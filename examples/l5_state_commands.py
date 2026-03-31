@@ -1,10 +1,13 @@
 """
 Layer 5 — 状态管理 & 斜杠命令
 对应源码：claudecode_src/src/state/ + context.ts + commands/ + history.ts
+配套深挖：
+  - 中文：docs/layers/l5-state-commands.md
+  - English: docs/layers/l5-state-commands.en.md
 
 核心问题：Claude Code 的多轮记忆、用户设置、斜杠命令存在哪里？怎么工作的？
 
-答：两个相互配合的系统：
+你会看到：两个相互配合的系统：
 
   1. AppStateStore（state/ 目录）
      类 Redux 的不可变状态存储。状态永远不直接修改，
@@ -17,6 +20,10 @@ Layer 5 — 状态管理 & 斜杠命令
      命令可以修改状态、注入消息、或直接返回文字。
 
 无需 API Key 即可运行。
+
+运行后请回答：
+  - 为什么 slash command 更像命令注册表，而不是特殊语法？
+  - 哪些状态应该进 store，哪些不应该？
 """
 
 from dataclasses import dataclass, replace

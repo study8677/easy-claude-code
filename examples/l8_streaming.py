@@ -1,10 +1,13 @@
 """
 Layer 8 — Async Generator：Claude Code 的流式架构
 对应源码：claudecode_src/src/query.ts（async function* query()）
+配套深挖：
+  - 中文：docs/layers/l8-streaming.md
+  - English: docs/layers/l8-streaming.en.md
 
 核心问题：为什么 Claude Code 用 async generator 而不是回调或 Promise？
 
-答：因为 Agent Loop 需要同时满足三个要求：
+你会看到：因为 Agent Loop 需要同时满足三个要求：
   1. 流式输出（边生成边显示，不等全部完成）
   2. 可取消（用户按 Ctrl+C 时立即停止）
   3. 可组合（子 Agent 的事件可以 yield* 传递给父 Agent）
@@ -30,6 +33,9 @@ Layer 8 — Async Generator：Claude Code 的流式架构
 运行前需要设置：
   export DEEPSEEK_API_KEY=你的key
   pip install openai
+
+如果你暂时没有 API Key：
+  先读 docs/layers/l8-streaming.md，再去 services/api/claude.ts 搜 `first_chunk`。
 """
 
 import os

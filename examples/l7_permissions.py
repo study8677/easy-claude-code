@@ -2,10 +2,13 @@
 Layer 7 — 三层权限系统
 对应源码：claudecode_src/src/tools/BashTool/bashPermissions.ts
          claudecode_src/src/tools/BashTool/bashSecurity.ts
+配套深挖：
+  - 中文：docs/layers/l7-permissions.md
+  - English: docs/layers/l7-permissions.en.md
 
 核心问题：Claude Code 怎么决定一条命令是否可以执行？
 
-答：三道防线，从快到慢依次检查——
+你会看到：三道防线，从快到慢依次检查——
 
   第一层：语义拒绝（最快，静态分析）
     通过 tree-sitter AST 或字符串规则检测真正危险的操作。
@@ -24,6 +27,10 @@ Layer 7 — 三层权限系统
 这个设计保证了：危险操作永远被拦截，安全操作不打扰用户。
 
 无需 API Key 即可运行。
+
+运行后请回答：
+  - 为什么“每次都问用户”不是好的权限模型？
+  - 数字 ID 相比字符串检查名有什么工程优势？
 """
 
 import re

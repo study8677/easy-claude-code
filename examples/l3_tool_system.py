@@ -1,14 +1,21 @@
 """
 Layer 3 — 工具系统
 对应源码：claudecode_src/src/Tool.ts + tools.ts + tools/*/
+配套深挖：
+  - 中文：docs/layers/l3-tool-system.md
+  - English: docs/layers/l3-tool-system.en.md
 
 核心问题：Claude Code 怎么定义、注册、调用工具？
 
-答：每个工具 = JSON Schema（给模型看）+ Python 函数（在本地执行）。
+你会看到：每个工具 = JSON Schema（给模型看）+ Python 函数（在本地执行）。
   Tool.ts 定义接口，tools/ 下每个目录是一个工具的完整实现，
   tools.ts 是注册表，把所有工具汇总成模型可以调用的列表。
 
 这个文件无需 API Key 即可运行，直接演示工具的定义和分发逻辑。
+
+运行后请回答：
+  - 为什么 schema 和 execute 必须分开？
+  - 工具注册表在 Agent 系统里承担了什么角色？
 """
 
 import subprocess

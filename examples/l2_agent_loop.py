@@ -1,10 +1,13 @@
 """
 Layer 2 — Agent 核心循环
 对应源码：claudecode_src/src/query.ts + QueryEngine.ts
+配套深挖：
+  - 中文：docs/layers/l2-agent-loop.md
+  - English: docs/layers/l2-agent-loop.en.md
 
 核心问题：Claude Code 怎么一直循环调用工具直到任务完成？
 
-答：query.ts 里有一个 async generator function*，内部是 while (true)。
+你会看到：query.ts 里有一个 async generator function*，内部是 while (true)。
   每轮循环：调用模型 → 如果返回工具调用就执行 → 把结果追回历史 → 继续。
   模型说"我做完了"（stop_reason = end_turn）时 return，循环结束。
 
@@ -13,6 +16,9 @@ Layer 2 — Agent 核心循环
 运行前需要设置：
   export DEEPSEEK_API_KEY=你的key
   pip install openai
+
+如果你暂时没有 API Key：
+  先读 docs/layers/l2-agent-loop.md，再配合 docs/source-map.md 搜 `queryLoop`。
 """
 
 import os

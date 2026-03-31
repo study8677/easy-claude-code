@@ -141,8 +141,18 @@ Useful search terms:
 5. `memdir/memdir.ts`
 6. `coordinatorMode.ts`
 
-## 8. Read Alongside
+## 8. Advanced Deep-Dive Topics
+
+- [L10 QueryEngine And System Prompt Assembly](./layers/l10-query-engine.en.md)
+- [L11 API Streaming And The Event Model](./layers/l11-api-streaming.en.md)
+- [L12 The REPL Screen And Input System](./layers/l12-repl-ui.en.md)
+- [L13 MCP, Hooks, And Plugins](./layers/l13-mcp-hooks-plugins.en.md)
+- [L14 Memory Extraction And Team Memory](./layers/l14-memory-system.en.md)
+- [L15 Print, Serve, Bridge, And Other Runtime Modes](./layers/l15-runtime-modes.en.md)
+
+## 9. Read Alongside
 
 - philosophy guide: [`../PHILOSOPHY_EN.MD`](../PHILOSOPHY_EN.MD)
+- navigation guide: [`source-navigation.en.md`](./source-navigation.en.md)
 - article roadmap: [`articles/series.en.md`](./articles/series.en.md)
 - per-layer notes: [`layers/README.en.md`](./layers/README.en.md)

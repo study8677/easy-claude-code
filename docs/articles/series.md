@@ -30,6 +30,32 @@
    - 对应仓库：`l6-advanced`
    - 重点：structured output、worker 隔离、多 Agent 组合
 
+## 第二批 6 篇文章
+
+7. QueryEngine 为什么是会话 orchestration 中心
+   - 对应仓库：`l10-query-engine`
+   - 重点：system prompt 拼装、message staging、session orchestration
+
+8. Claude Code 的 API streaming 不是“边输边打字”
+   - 对应仓库：`l11-api-streaming`
+   - 重点：event model、TTFB、stall detection、watchdog
+
+9. REPL.tsx 为什么是交互编排层，而不是普通页面组件
+   - 对应仓库：`l12-repl-ui`
+   - 重点：initial message、onSubmit / onQuery、局部状态边界
+
+10. Claude Code 为什么同时有 MCP、hooks、plugins 三套扩展面
+   - 对应仓库：`l13-mcp-hooks-plugins`
+   - 重点：能力接入、生命周期插桩、功能打包
+
+11. memory extraction 与 team memory 的真正边界
+   - 对应仓库：`l14-memory-system`
+   - 重点：typed memory、extractMemories、team memory safety
+
+12. 为什么 Claude Code 需要 print / serve / bridge 这些运行模式
+   - 对应仓库：`l15-runtime-modes`
+   - 重点：entrypoint、多运行面、bridge 长生命周期
+
 ## 写作约束
 
 - 每篇文章都必须回链一个 layer 文档和一个 source-map 节点

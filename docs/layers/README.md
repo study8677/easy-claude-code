@@ -14,7 +14,17 @@
 8. [L8 Streaming](./l8-streaming.md)
 9. [L9 Context 管理](./l9-context.md)
 
+进阶专题：
+
+10. [L10 QueryEngine 与系统 Prompt 拼装](./l10-query-engine.md)
+11. [L11 API Streaming 与事件模型](./l11-api-streaming.md)
+12. [L12 REPL 主界面与输入系统](./l12-repl-ui.md)
+13. [L13 MCP / Hooks / Plugins 扩展面](./l13-mcp-hooks-plugins.md)
+14. [L14 Memory 提取与 Team Memory](./l14-memory-system.md)
+15. [L15 Print / Serve / Bridge 等运行模式](./l15-runtime-modes.md)
+
 建议搭配：
 
 - [源码导图](../source-map.md)
+- [源码导航手册](../source-navigation.md)
 - [设计哲学](../../PHILOSOPHY.MD)

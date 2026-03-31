@@ -84,10 +84,29 @@ See the deep-dive notes in:
 
 - [Source Map (English)](./docs/source-map.en.md)
 - [源码导图（中文）](./docs/source-map.md)
+- [Layer Deep-Dive Index (English)](./docs/layers/README.en.md)
+- [Layer 深挖目录（中文）](./docs/layers/README.md)
 - [Design Philosophy (English)](./PHILOSOPHY_EN.MD)
 - [设计哲学（中文）](./PHILOSOPHY.MD)
+- [Source Navigation Guide (English)](./docs/source-navigation.en.md)
+- [源码导航手册（中文）](./docs/source-navigation.md)
+- [Study Exercises (English)](./docs/exercises.en.md)
+- [学习练习册（中文）](./docs/exercises.md)
+- [FAQ (English)](./docs/faq.en.md)
+- [FAQ（中文）](./docs/faq.md)
 - [Article Roadmap (English)](./docs/articles/series.en.md)
 - [文章选题路线（中文）](./docs/articles/series.md)
+
+## Advanced Deep-Dive Topics
+
+Once you finish the 9 example layers, continue with these source-heavy topics:
+
+- [L10 QueryEngine And System Prompt Assembly](./docs/layers/l10-query-engine.en.md)
+- [L11 API Streaming And The Event Model](./docs/layers/l11-api-streaming.en.md)
+- [L12 The REPL Screen And Input System](./docs/layers/l12-repl-ui.en.md)
+- [L13 MCP, Hooks, And Plugins](./docs/layers/l13-mcp-hooks-plugins.en.md)
+- [L14 Memory Extraction And Team Memory](./docs/layers/l14-memory-system.en.md)
+- [L15 Print, Serve, Bridge, And Other Runtime Modes](./docs/layers/l15-runtime-modes.en.md)
 
 ## Setup
 

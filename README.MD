@@ -84,10 +84,29 @@ python examples/l1_startup.py serve
 
 - [源码导图（中文）](./docs/source-map.md)
 - [Source Map (English)](./docs/source-map.en.md)
+- [Layer 深挖目录（中文）](./docs/layers/README.md)
+- [Layer Deep-Dive Index (English)](./docs/layers/README.en.md)
 - [设计哲学（中文）](./PHILOSOPHY.MD)
 - [Design Philosophy (English)](./PHILOSOPHY_EN.MD)
+- [源码导航手册（中文）](./docs/source-navigation.md)
+- [Source Navigation Guide (English)](./docs/source-navigation.en.md)
+- [学习练习册（中文）](./docs/exercises.md)
+- [Study Exercises (English)](./docs/exercises.en.md)
+- [FAQ（中文）](./docs/faq.md)
+- [FAQ (English)](./docs/faq.en.md)
 - [文章选题路线（中文）](./docs/articles/series.md)
 - [Article Roadmap (English)](./docs/articles/series.en.md)
+
+## 进阶深挖专题
+
+如果你已经走完 9 层示例，下一步建议直接读这些专题：
+
+- [L10 QueryEngine 与系统 Prompt 拼装](./docs/layers/l10-query-engine.md)
+- [L11 API Streaming 与事件模型](./docs/layers/l11-api-streaming.md)
+- [L12 REPL 主界面与输入系统](./docs/layers/l12-repl-ui.md)
+- [L13 MCP / Hooks / Plugins 扩展面](./docs/layers/l13-mcp-hooks-plugins.md)
+- [L14 Memory 提取与 Team Memory](./docs/layers/l14-memory-system.md)
+- [L15 Print / Serve / Bridge 等运行模式](./docs/layers/l15-runtime-modes.md)
 
 ## 环境配置
 

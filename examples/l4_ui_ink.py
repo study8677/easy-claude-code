@@ -1,10 +1,13 @@
 """
 Layer 4 — UI 层（Ink/React）
 对应源码：claudecode_src/src/components/ + screens/ + outputStyles/ + ink.ts
+配套深挖：
+  - 中文：docs/layers/l4-ui-ink.md
+  - English: docs/layers/l4-ui-ink.en.md
 
 核心问题：Claude Code 的进度条、spinner、彩色输出是怎么渲染的？
 
-答：Claude Code 用 Ink 框架在终端里跑 React 组件树。
+你会看到：Claude Code 用 Ink 框架在终端里跑 React 组件树。
   核心思想：UI = f(state)，状态变了就重新渲染，React 负责 diff。
   这和浏览器里写 React 没有本质区别——只不过渲染目标是终端而非 DOM。
 
@@ -17,6 +20,10 @@ Layer 4 — UI 层（Ink/React）
     </App>
 
 这个文件用 Python 模拟 Ink 的"状态驱动重渲染"思路，无需 Node.js。
+
+运行后请回答：
+  - 为什么终端 UI 也适合做声明式渲染？
+  - 如果没有状态驱动重绘，工具进度会出什么问题？
 """
 
 import sys

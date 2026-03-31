@@ -1,10 +1,13 @@
 """
 Layer 6 — 高级机制：技能 / 多 Agent 协调 / 费用追踪
 对应源码：claudecode_src/src/skills/ + coordinator/ + cost-tracker.ts
+配套深挖：
+  - 中文：docs/layers/l6-advanced.md
+  - English: docs/layers/l6-advanced.en.md
 
 核心问题：Claude Code 如何复用提示词？如何并行调度多个 Agent？怎么算钱？
 
-答：三个相互独立的系统：
+你会看到：三个相互独立的系统：
 
   1. 技能系统（skills/）
      技能 = 带 frontmatter 的 Markdown 文件，在启动时编译成斜杠命令。
@@ -21,6 +24,10 @@ Layer 6 — 高级机制：技能 / 多 Agent 协调 / 费用追踪
      真实代码：cost-tracker.ts + bootstrap/state.js (全局累加器)
 
 无需 API Key 即可运行。
+
+运行后请回答：
+  - 技能、工具、命令分别在解决什么问题？
+  - 为什么 coordinator 和 worker 之间要有 structured output 边界？
 """
 
 import re
