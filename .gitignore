@@ -1,0 +1,26 @@
+# Claude Code 源码（本地研究用，不上传）
+claudecode_src/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# 环境变量
+.env
+.env.*
+
+# 编辑器 / 系统
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 依赖
+node_modules/
