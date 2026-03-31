@@ -15,6 +15,7 @@ easy_claude_code/
 ├── README.MD                  # 中文主 README（学习路线入口）
 ├── README_EN.MD               # 英文 README
 ├── PHILOSOPHY.MD              # Claude Code 设计哲学（10节深度解析）
+├── PHILOSOPHY_EN.MD           # 英文版设计哲学
 ├── .gitignore                 # claudecode_src/ 已排除，不上传
 │
 ├── examples/                  # 9 个可运行的 Python 示例
@@ -28,9 +29,11 @@ easy_claude_code/
 │   ├── l8_streaming.py        # Layer 8：Async Generator 流式架构 ★需要API Key
 │   └── l9_context_mgmt.py     # Layer 9：Context Window 管理 & Prompt Cache
 │
-├── v1_basic_agent.py          # 完整 Agent 实现（~200行，同步循环，推荐热身）
-├── v2_async_agent.py          # 异步版 Agent（step 状态机）
-├── easy_cil.py                # 最小 Agent（单工具 + 安全护栏）
+├── docs/
+│   ├── source-map.md          # 中文源码导图（调用链入口）
+│   ├── source-map.en.md       # 英文源码导图
+│   ├── layers/                # 9 层双语深挖文档
+│   └── articles/              # 双语文章选题路线
 │
 └── claudecode_src/            # Claude Code TypeScript 源码（本地，已 gitignore）
     ├── src/                   # 主源码目录
@@ -107,8 +110,8 @@ easy_claude_code/
 2. **添加 `examples/l10_mcp.py`**：MCP 协议是 Claude Code 扩展工具的方式，还没有专门示例
 3. **添加源码阅读笔记**：为 `claudecode_src/src/` 的关键文件加内联注释，帮助阅读（本地文件，不上传）
 4. **制作学习路线图**：用 Mermaid 图把 9 层学习路线和对应源码文件画出来，放进 README
-5. **英文版 PHILOSOPHY.MD**：目前只有中文，可以加英文版 `PHILOSOPHY_EN.MD`
-6. **增加"常见问题"部分**：整理初学者读源码时最容易卡住的地方
+5. **增加"常见问题"部分**：整理初学者读源码时最容易卡住的地方
+6. **补更深的源码主题**：例如 QueryEngine / API streaming / REPL / MCP-Hooks / Bridge 模式
 
 ---
 
@@ -124,7 +127,7 @@ export DEEPSEEK_API_KEY=你的key
 export ANTHROPIC_API_KEY=你的key
 ```
 
-需要 API Key 的文件：`l2_agent_loop.py`、`l8_streaming.py`、`v1_basic_agent.py`、`v2_async_agent.py`
+需要 API Key 的文件：`l2_agent_loop.py`、`l8_streaming.py`
 
 其余示例无需 API Key，直接 `python examples/lX_xxx.py` 运行。
 

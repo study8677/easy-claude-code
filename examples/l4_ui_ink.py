@@ -180,7 +180,7 @@ def demo():
     t.join()
     state = update(state,
         messages=state.messages + [
-            {"role": "tool", "content": "README.MD  v1_basic_agent.py  examples/..."},
+            {"role": "tool", "content": "README.MD  PHILOSOPHY.MD  examples/..."},
         ],
         active_tool=None,
         cost_usd=0.0003,
