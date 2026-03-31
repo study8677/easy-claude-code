@@ -1,226 +1,339 @@
-# easy_claude_code — Claude Code Source Code Study Roadmap
+# Claude Code — Deep Dive
 
-English Version | [中文版](./README.MD)
+[中文](./README.MD) | English
 
-> The Claude Code source code has been leaked. This repo archives it and provides a systematic reading roadmap to help you truly understand how it works.
-
----
-
-## About the Source Code
-
-The TypeScript source code of Claude Code leaked recently. This repository includes it under the `claudecode_src/` directory. **It is listed in `.gitignore` and will NOT be pushed to GitHub — for local study only.**
-
-```
-claudecode_src/
-├── src/          # TypeScript / React source code (core)
-└── vendor/       # Native module sources (audio, image, URL handling, etc.)
-```
+> The most systematic guide to reading the Claude Code source — from startup entry to multi-agent coordination, with runnable examples at every layer.
 
 ---
 
-## Contents
+## What This Is
 
-- [How to Start](#how-to-start)
-- [Layer 1: Startup & Entry Points](#layer-1-startup--entry-points)
-- [Layer 2: Agent Core Loop](#layer-2-agent-core-loop)
-- [Layer 3: Tool System](#layer-3-tool-system)
-- [Layer 4: UI Layer — Ink/React](#layer-4-ui-layer--inkreact)
-- [Layer 5: State & Commands](#layer-5-state--commands)
-- [Layer 6: Advanced Mechanisms](#layer-6-advanced-mechanisms)
-- [Supplementary Exercises: Python Simplified Versions](#supplementary-exercises-python-simplified-versions)
-- [Disclaimer](#disclaimer)
+This repo includes the Claude Code TypeScript source (`claudecode_src/`, gitignored for local study only) and a **6-layer progressive reading roadmap**.
 
----
-
-## How to Start
-
-**Do not read cover to cover.** The codebase is large. The right approach is to read by module, driven by questions.
-
-Recommended order: Entry → Loop → Tools → UI → State → Advanced
-
-For each module, ask yourself:
-- What problem does this file solve?
-- If I had to implement this from scratch, how would I do it?
-- What is this similar to that I already know?
-
----
-
-## Layer 1: Startup & Entry Points
-
-**Core question**: What happens after you type the `claude` command?
+Each layer includes:
+- The core question and key files
+- A runnable Python example (`examples/` directory)
+- Annotated source snippets
 
 ```
-claudecode_src/src/
-├── main.tsx                  # Main entry: CLI parsing, initialization, REPL launch
-├── entrypoints/              # Different startup modes (interactive, non-interactive, server)
-├── bootstrap/                # First-run initialization logic
-├── setup.ts                  # Environment detection, config loading
-└── replLauncher.tsx          # REPL session launcher
-```
-
-**Key things to read:**
-- Argument parsing and mode dispatch in `main.tsx`
-- How `setup.ts` detects API keys, permissions, and OS differences
-- The fork point between interactive and non-interactive modes in `entrypoints/`
-
----
-
-## Layer 2: Agent Core Loop
-
-**Core question**: How does Claude Code keep looping through tool calls until a task is complete?
-
-```
-claudecode_src/src/
-├── query.ts                  # Single conversation request handler
-├── QueryEngine.ts            # Multi-turn loop engine (where the Agent Loop lives)
-├── query/                    # Query sub-modules (streaming, error handling, etc.)
-├── Task.ts                   # Data structure for a single task
-├── tasks.ts                  # Task registration and management
-└── tasks/                    # Sub-tasks, parallel tasks, and extensions
-```
-
-**Key things to read:**
-- `QueryEngine.ts` is the heart of the entire agent — find where the while loop is
-- `query.ts` handles a single API call, including streaming response assembly
-- `Task.ts` defines the task state machine: `pending → running → completed/error`
-- Compare with `v1_basic_agent.py` (the Python simplified version in this repo) to understand the gap
-
----
-
-## Layer 3: Tool System
-
-**Core question**: What built-in tools does Claude Code have, and how is each one implemented?
-
-```
-claudecode_src/src/
-├── Tool.ts                   # Base class / interface for all tools
-├── tools.ts                  # Registry of all tools
-└── tools/                    # Individual tool implementations
-    ├── BashTool/             # Execute shell commands
-    ├── FileReadTool/         # Read files
-    ├── FileEditTool/         # Precise file editing
-    ├── FileWriteTool/        # Write files
-    ├── GlobTool/             # File pattern matching
-    ├── GrepTool/             # Content search
-    ├── AgentTool/            # Sub-agent (most complex)
-    ├── MCPTool/              # MCP protocol tool
-    ├── TodoWriteTool/        # Todo management
-    ├── TaskCreateTool/       # Task creation
-    ├── SkillTool/            # Skill invocation
-    ├── LSPTool/              # Language Server Protocol integration
-    ├── EnterPlanModeTool/    # Plan mode
-    └── ...  (30+ tools total)
-```
-
-**Key things to read:**
-- Start with `Tool.ts` — understand the interface: `name / description / inputSchema / call()`
-- Then read `BashTool/` — the most fundamental tool with the most direct logic
-- Read `AgentTool/` to understand how sub-agents are nested (most complex)
-- Pay attention to each tool's `inputSchema` — that's exactly what the model sees as JSON Schema
-
----
-
-## Layer 4: UI Layer — Ink/React
-
-**Core question**: How are the pretty output, progress bars, and dialogs rendered in a terminal?
-
-```
-claudecode_src/src/
-├── ink.ts                    # Ink framework entry (React for CLI)
-├── components/               # UI component library
-│   ├── App.tsx               # Root component
-│   ├── AgentProgressLine.tsx # Agent execution progress display
-│   ├── BashModeProgress.tsx  # Bash execution progress
-│   ├── CompactSummary.tsx    # Conversation summary
-│   └── ...
-├── screens/                  # Different screens/pages (onboarding, main UI, etc.)
-├── outputStyles/             # Output styles (syntax highlighting, Markdown rendering)
-└── dialogLaunchers.tsx       # Dialog trigger logic
-```
-
-**Key things to read:**
-- `App.tsx` is the root of the React component tree — get the overall layout clear
-- Claude Code uses the **Ink** framework to render React components in the terminal — same syntax as web React
-- `outputStyles/` explains why code blocks have syntax highlighting
-
----
-
-## Layer 5: State & Commands
-
-**Core question**: Where is multi-turn conversation history, user settings, and session state stored?
-
-```
-claudecode_src/src/
-├── state/                    # Global state management
-│   ├── AppState.tsx          # Application state definition
-│   ├── AppStateStore.ts      # State store (Redux-like)
-│   ├── store.ts              # State store entry point
-│   └── selectors.ts          # State selectors
-├── context/                  # React Context (component-level shared state)
-├── context.ts                # Conversation context (message history)
-├── history.ts                # History persistence
-├── commands.ts               # Slash command registration
-└── commands/                 # Each slash command's implementation (/help /clear /model etc.)
-```
-
-**Key things to read:**
-- `context.ts` manages message history — this is the foundation of the agent's multi-turn memory
-- Each `.ts` file in `commands/` corresponds to one `/command`
-- `state/AppStateStore.ts` has an architecture close to Redux but without the Redux dependency
-
----
-
-## Layer 6: Advanced Mechanisms
-
-After finishing the first five layers, dive into these advanced modules:
-
-```
-claudecode_src/src/
-├── skills/                   # Skills system (reusable agent behaviors)
-│   ├── bundled/              # Built-in skills
-│   └── bundledSkills.ts      # Skill registration
-├── coordinator/              # Multi-agent coordinator
-│   └── coordinatorMode.ts    # Coordinator mode (manages multiple sub-agents)
-├── buddy/                    # Buddy mode (pair-programming assistant)
-├── remote/                   # Remote execution (non-local environments)
-├── server/                   # HTTP server mode
-├── keybindings/              # Keyboard shortcut system
-├── vim/                      # Vim mode support
-├── voice/                    # Voice input
-├── plugins/                  # Plugin system
-├── memdir/                   # Memory directory (persistent memory)
-├── cost-tracker.ts           # Token usage and cost tracking
-└── costHook.ts               # Cost hooks
-
-claudecode_src/vendor/        # Native modules
-├── audio-capture-src/        # Audio capture (voice input backend)
-├── image-processor-src/      # Image processing
-├── modifiers-napi-src/       # Keyboard modifier key detection (Node.js native addon)
-└── url-handler-src/          # URL protocol handling
+claudecode_src/src/       ← TypeScript source (local only, not pushed)
+examples/                 ← 6 runnable Python examples
+├── l1_startup.py         ← Startup & entry
+├── l2_agent_loop.py      ← Agent core loop ★
+├── l3_tool_system.py     ← Tool system
+├── l4_ui_ink.py          ← UI layer
+├── l5_state_commands.py  ← State & slash commands
+└── l6_advanced.py        ← Skills / multi-agent / cost tracking
+v1_basic_agent.py         ← Full agent in 200 lines (recommended warm-up)
+v2_async_agent.py         ← Async agent version
 ```
 
 ---
 
-## Supplementary Exercises: Python Simplified Versions
+## Quick Warm-Up (5 minutes)
 
-This repo also contains three Python files — minimal re-implementations of Claude Code's core mechanisms. Use them as a warm-up before reading the source, or as a reference after studying a module:
-
-| File | Corresponding Source Module | Purpose |
-|------|-----------------------------|---------|
-| `easy_cil.py` | `tools/BashTool/` | Minimum viable: single tool + safety guardrails |
-| `v1_basic_agent.py` | `QueryEngine.ts` + core tools | Full agent loop (synchronous) |
-| `v2_async_agent.py` | `Task.ts` + `tasks/` | Async task decoupling (state machine) |
+Before reading the source, run this 200-line simplified version to build intuition:
 
 ```bash
 pip install openai python-dotenv
 export DEEPSEEK_API_KEY=your_key
+
 python v1_basic_agent.py
+# Try: list current directory
+# Try: read README_EN.MD first 20 lines
+# Try: create hello.txt with "hello world"
+```
+
+After running this you'll understand 70% of Claude Code's core mechanics. The rest is in the source.
+
+---
+
+## 6-Layer Reading Roadmap
+
+### Layer 1 — Startup & Entry Points
+**Key files**: `main.tsx` · `entrypoints/` · `setup.ts`
+
+**Core question**: What actually happens after you type `claude`?
+
+Claude Code does three things before showing you the REPL:
+
+```python
+# l1_startup.py core (maps to main.tsx + setup.ts)
+
+def startup_checkpoint(name):
+    # Claude Code timestamps each startup phase to track where time is spent
+    print(f"[{name}] +{elapsed_ms:.1f}ms")
+
+def main():
+    startup_checkpoint("main_entry")   # profileCheckpoint('main_tsx_entry')
+    config = load_config()             # setup.ts: read config, detect API key
+    session_id = setup(config)         # generate session_id, inject env vars
+    startup_checkpoint("ready")
+
+    # Mode dispatch (maps to entrypoints/ directory)
+    if "--print" in sys.argv:          # claude --print "..." → run and exit
+        run_non_interactive(prompt)
+    elif "serve" in sys.argv:          # claude serve → HTTP server
+        run_server_mode()
+    else:                              # claude → interactive REPL
+        run_interactive_repl()
+```
+
+> Run the example: `python examples/l1_startup.py`
+> Source: `claudecode_src/src/main.tsx`, `claudecode_src/src/setup.ts`
+
+---
+
+### Layer 2 — Agent Core Loop ★
+**Key files**: `query.ts` · `QueryEngine.ts` · `Task.ts`
+
+**Core question**: How does Claude Code keep looping through tool calls until done?
+
+This is the heart of all of Claude Code. Everything else is scaffolding around it:
+
+```python
+# l2_agent_loop.py core (maps to query.ts async function* queryLoop())
+
+def query_loop(messages):
+    while True:                          # ← query.ts line 307: while (true)
+
+        response = call_model(messages)
+        reply = response.choices[0].message
+
+        if not reply.tool_calls:
+            return reply.content         # model says "done" → exit loop
+
+        # Execute tool calls, append results, continue loop
+        messages.append(assistant_msg(reply))
+        for tc in reply.tool_calls:
+            result = run_tool(tc.function.name, tc.function.arguments)
+            messages.append(tool_result(tc.id, result))
+        # ↑ That's it: results go back into history, model sees them next turn
+```
+
+The real `query.ts` makes this an `async generator function*` so it can `yield` each step as an event (`stream_request_start` · `tool_use` · `tool_result` · `done`), letting the UI update in real time.
+
+> Run the example: `python examples/l2_agent_loop.py` (requires API key)
+> Source: `claudecode_src/src/query.ts` — search for `while (true)`
+
+---
+
+### Layer 3 — Tool System
+**Key files**: `Tool.ts` · `tools.ts` · `tools/BashTool/` · `tools/FileReadTool/` · ...
+
+**Core question**: What built-in tools does Claude Code have and how is each one implemented?
+
+A tool = **JSON Schema (for the model) + a function (runs locally)**. That's it:
+
+```python
+# l3_tool_system.py core (maps to Tool.ts ToolDef + buildTool())
+
+@dataclass
+class ToolDef:
+    name: str
+    description: str
+    schema: dict       # ← sent to the model (all the model ever sees)
+    execute: Callable  # ← runs on your machine (model never sees this)
+    needs_permission: bool = False
+
+# Registry (maps to tools.ts getTools())
+TOOL_REGISTRY = {
+    "bash":       ToolDef("bash",       "Run shell command",  bash_schema,  run_bash,   needs_permission=True),
+    "read_file":  ToolDef("read_file",  "Read a file",        read_schema,  read_file,  needs_permission=False),
+    "write_file": ToolDef("write_file", "Write a file",       write_schema, write_file, needs_permission=True),
+    "edit_file":  ToolDef("edit_file",  "Edit a file",        edit_schema,  edit_file,  needs_permission=True),
+}
+
+def dispatch(name, args):
+    tool = TOOL_REGISTRY[name]
+    if tool.needs_permission and not ask_permission(name, args):
+        return "Permission denied by user"
+    return tool.execute(args)   # ← Tool.ts call()
+```
+
+Claude Code has **30+ tools** in production. Each subdirectory in `tools/` is a complete tool implementation including UI components, permission checks, and error handling.
+
+> Run the example: `python examples/l3_tool_system.py` (no API key needed)
+> Source: `claudecode_src/src/Tool.ts`, `claudecode_src/src/tools/BashTool/BashTool.tsx`
+
+---
+
+### Layer 4 — UI Layer (Ink/React)
+**Key files**: `components/App.tsx` · `components/AgentProgressLine.tsx` · `outputStyles/` · `ink.ts`
+
+**Core question**: How are the spinner, progress bars, and colored output rendered in the terminal?
+
+Claude Code uses the **Ink** framework to run a React component tree in the terminal. The core idea: `UI = f(state)` — when state changes, re-render:
+
+```python
+# l4_ui_ink.py core (simulates Ink's state-driven rendering)
+
+@dataclass
+class UIState:
+    messages: list        # conversation history
+    active_tool: str      # tool currently running
+    spinner_frame: int    # animation frame
+    cost_usd: float       # session cost
+
+def render(state: UIState):
+    """
+    Pure function: same state → same terminal output.
+    Ink's React reconciler diffs and updates only changed parts.
+    This is why spinner animation and scrollback history coexist.
+    """
+    clear_screen()
+    for msg in state.messages[-8:]:
+        print_message(msg)                                           # MessageList.tsx
+    if state.active_tool:
+        print(f"{spinner(state.spinner_frame)} {state.active_tool}") # AgentProgressLine.tsx
+    print(f"Cost: ${state.cost_usd:.4f}")                           # StatusBar.tsx
+```
+
+> Run the example: `python examples/l4_ui_ink.py` (no API key, shows animation)
+> Source: `claudecode_src/src/components/App.tsx`, `claudecode_src/src/ink.ts`
+
+---
+
+### Layer 5 — State & Slash Commands
+**Key files**: `state/AppStateStore.ts` · `context.ts` · `commands/` · `history.ts`
+
+**Core question**: Where is conversation history stored? How are `/clear`, `/model` implemented?
+
+```python
+# l5_state_commands.py core
+
+# ── 1. Immutable state (maps to AppStateStore.ts) ─────────
+@dataclass(frozen=True)   # frozen = cannot mutate directly
+class AppState:
+    messages: tuple = ()   # tuple (immutable) — replace the whole thing to update
+    model: str = "deepseek-chat"
+    cost_usd: float = 0.0
+
+store = AppStateStore(AppState(), on_change=save_to_disk)
+store.set(lambda s: replace(s, model="claude-sonnet-4-6"))  # only legal update path
+
+# ── 2. Slash commands (maps to commands/ directory) ────────
+# /clear /model /cost /help all share the same structure, registered in a dict
+@dataclass
+class SlashCommand:
+    name: str
+    description: str
+    execute: Callable   # (store, args) -> str | None
+
+COMMANDS = {
+    "clear":   SlashCommand("clear",   "Clear history",     cmd_clear),
+    "model":   SlashCommand("model",   "Switch model",      cmd_model),
+    "compact": SlashCommand("compact", "Compress history",  cmd_compact),
+}
+```
+
+**The secret of multi-turn memory**: message history only ever grows — nothing is deleted (except on `/clear`). Every API call passes the full history in — that's how the model "remembers" what was said.
+
+> Run the example: `python examples/l5_state_commands.py` (no API key, interactive)
+> Source: `claudecode_src/src/state/AppStateStore.ts`, `claudecode_src/src/commands/`
+
+---
+
+### Layer 6 — Advanced Mechanisms
+**Key files**: `skills/` · `coordinator/coordinatorMode.ts` · `cost-tracker.ts` · `buddy/` · `memdir/`
+
+The first 5 layers cover Claude Code's skeleton. This layer is the flesh.
+
+**Skills system**: a `.md` file is a skill, compiled into a slash command at startup
+```markdown
+---
+name: run-tests
+description: Run tests and show failures
+allowed_tools: [bash]
+---
+Run `pytest -x --tb=short`, show failures, suggest fixes.
+```
+
+**Multi-agent coordination**: coordinator splits big tasks across parallel workers
+```
+coordinator Claude
+  ├── AgentTool → worker 1 (restricted toolset) → SyntheticOutputTool
+  ├── AgentTool → worker 2 (restricted toolset) → SyntheticOutputTool
+  └── collect results, produce final answer
+```
+
+**Cost tracking**: token usage accumulates per API call, displayed live in the status bar
+```python
+tracker.record(input_tokens=1500, output_tokens=300)
+print(f"${tracker.total_cost_usd():.6f}")   # precise to the micro-dollar
+```
+
+> Run the example: `python examples/l6_advanced.py` (no API key needed)
+> Source: `claudecode_src/src/skills/`, `claudecode_src/src/coordinator/`, `claudecode_src/src/cost-tracker.ts`
+
+---
+
+## Source Directory Quick Reference
+
+```
+claudecode_src/src/
+├── main.tsx              ← L1  CLI entry point
+├── entrypoints/          ← L1  interactive / non-interactive / server modes
+├── setup.ts              ← L1  environment initialization
+│
+├── query.ts              ← L2  ★ Agent Loop (while(true) lives here)
+├── QueryEngine.ts        ← L2  multi-turn loop engine
+├── Task.ts / tasks/      ← L2  task state machine
+│
+├── Tool.ts               ← L3  tool interface definition
+├── tools.ts              ← L3  tool registry
+├── tools/                ← L3  30+ tool implementations
+│   ├── BashTool/         ← L3  maps to l3 example bash tool
+│   ├── FileReadTool/     ← L3  maps to l3 example read_file
+│   ├── FileEditTool/     ← L3  maps to l3 example edit_file
+│   ├── AgentTool/        ← L6  sub-agent (most complex)
+│   └── MCPTool/          ← ext MCP protocol tools
+│
+├── ink.ts                ← L4  Ink framework entry
+├── components/           ← L4  React components (App.tsx, progress lines, etc.)
+├── screens/              ← L4  screens (onboarding, main UI)
+├── outputStyles/         ← L4  syntax highlighting, Markdown rendering
+│
+├── state/                ← L5  AppStateStore (Redux-like)
+├── context.ts            ← L5  message history
+├── history.ts            ← L5  persistence
+├── commands/             ← L5  slash command implementations
+│
+├── skills/               ← L6  skills system
+├── coordinator/          ← L6  multi-agent coordination
+├── cost-tracker.ts       ← L6  token cost accounting
+├── memdir/               ← L6  persistent memory (/memory command)
+├── buddy/                ← L6  buddy pair-programming mode
+└── server/               ← L6  HTTP server mode
+```
+
+---
+
+## How to Read
+
+1. **Run** `v1_basic_agent.py` first — build intuition for the agent loop
+2. **Work through** examples in order (`l1_` → `l6_`), each runs standalone
+3. **Cross-reference** the comments in each example to find the corresponding source
+4. **Read with questions** — don't read the TypeScript source linearly
+5. Each example file's docstring lists exactly which source files it maps to
+
+---
+
+## Setup
+
+```bash
+pip install openai python-dotenv
+
+# DeepSeek (recommended — generous free tier, compatible with v1/v2/l2)
+export DEEPSEEK_API_KEY=your_key
+export DEEPSEEK_MODEL=deepseek-chat   # optional
+
+# Or Anthropic Claude (edit base_url and model in examples)
+export ANTHROPIC_API_KEY=your_key
 ```
 
 ---
 
 ## Disclaimer
 
-This repository is intended solely for personal learning and technical research. The source code in the `claudecode_src/` directory originates from a leaked version circulating publicly online. This repository makes no representations as to its legal status. The directory is listed in `.gitignore` and will not be uploaded to any public platform alongside this repository.
-
-**Do not use the source code for any commercial purpose. Do not redistribute it. Do not use it in ways that infringe upon Anthropic's rights. All responsibility rests with the user.**
+This repository is for personal learning and technical research only. The source code in `claudecode_src/` is listed in `.gitignore` and will not be pushed to any public platform. Do not use it for commercial purposes or in ways that infringe upon Anthropic's rights. All responsibility rests with the user.
