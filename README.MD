@@ -3,27 +3,35 @@
 [English](./README_EN.MD) | 中文
 
 > 最系统的 Claude Code 源码阅读指南 — 从启动入口到多 Agent 协调，每一层都有可运行的示例。
+>
+> 📖 **设计哲学**：[PHILOSOPHY.MD](./PHILOSOPHY.MD) — 读懂源码背后的思考，挖掘真正的宝藏
 
 ---
 
 ## 这是什么
 
-本仓库收录了 Claude Code 的 TypeScript 源码（`claudecode_src/`，已加入 `.gitignore` 仅供本地研究），并整理了一份**6 层递进的源码学习路线**。
+本仓库收录了 Claude Code 的 TypeScript 源码（`claudecode_src/`，已加入 `.gitignore` 仅供本地研究），并整理了一份**9 层递进的源码学习路线** + 一份深度设计哲学文档。
 
 每一层都附有：
 - 核心问题与关键文件
 - 对应的可运行 Python 示例（`examples/` 目录）
 - 源码关键片段解读
 
+读完之后，再去看 [PHILOSOPHY.MD](./PHILOSOPHY.MD) 理解每个设计决策背后的"为什么"。
+
 ```
 claudecode_src/src/       ← TypeScript 源码（本地，不上传）
-examples/                 ← 6 个可运行的 Python 示例
+PHILOSOPHY.MD             ← ★ 设计哲学：读懂代码背后的思考
+examples/                 ← 9 个可运行的 Python 示例
 ├── l1_startup.py         ← 启动与入口
 ├── l2_agent_loop.py      ← Agent 核心循环 ★
 ├── l3_tool_system.py     ← 工具系统
-├── l4_ui_ink.py          ← UI 层
+├── l4_ui_ink.py          ← UI 层（含动画）
 ├── l5_state_commands.py  ← 状态管理 & 斜杠命令
-└── l6_advanced.py        ← 技能 / 多Agent / 费用追踪
+├── l6_advanced.py        ← 技能 / 多Agent / 费用追踪
+├── l7_permissions.py     ← 三层权限系统
+├── l8_streaming.py       ← Async Generator 流式架构
+└── l9_context_mgmt.py    ← Context Window 管理 & 缓存优化
 v1_basic_agent.py         ← 完整 Agent（200行，推荐热身）
 v2_async_agent.py         ← 异步版 Agent
 ```

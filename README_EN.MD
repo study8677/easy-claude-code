@@ -3,27 +3,35 @@
 [中文](./README.MD) | English
 
 > The most systematic guide to reading the Claude Code source — from startup entry to multi-agent coordination, with runnable examples at every layer.
+>
+> 📖 **Design Philosophy**: [PHILOSOPHY.MD](./PHILOSOPHY.MD) — Understand the *why* behind the code
 
 ---
 
 ## What This Is
 
-This repo includes the Claude Code TypeScript source (`claudecode_src/`, gitignored for local study only) and a **6-layer progressive reading roadmap**.
+This repo includes the Claude Code TypeScript source (`claudecode_src/`, gitignored for local study only) and a **9-layer progressive reading roadmap** plus a deep design philosophy document.
 
 Each layer includes:
 - The core question and key files
 - A runnable Python example (`examples/` directory)
 - Annotated source snippets
 
+After working through the layers, read [PHILOSOPHY.MD](./PHILOSOPHY.MD) to understand the *why* behind each design decision.
+
 ```
 claudecode_src/src/       ← TypeScript source (local only, not pushed)
-examples/                 ← 6 runnable Python examples
+PHILOSOPHY.MD             ← ★ Design philosophy: the "why" behind the code
+examples/                 ← 9 runnable Python examples
 ├── l1_startup.py         ← Startup & entry
 ├── l2_agent_loop.py      ← Agent core loop ★
 ├── l3_tool_system.py     ← Tool system
-├── l4_ui_ink.py          ← UI layer
+├── l4_ui_ink.py          ← UI layer (with animation)
 ├── l5_state_commands.py  ← State & slash commands
-└── l6_advanced.py        ← Skills / multi-agent / cost tracking
+├── l6_advanced.py        ← Skills / multi-agent / cost tracking
+├── l7_permissions.py     ← 3-layer permission system
+├── l8_streaming.py       ← Async generator streaming architecture
+└── l9_context_mgmt.py    ← Context window management & cache optimization
 v1_basic_agent.py         ← Full agent in 200 lines (recommended warm-up)
 v2_async_agent.py         ← Async agent version
 ```
