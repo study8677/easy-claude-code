@@ -1,158 +1,165 @@
-# Claude Code 源码导图
+# Claude Code 主线源码导图
 
 [English](./source-map.en.md) | 中文
 
-> 这份导图不是文件清单，而是“先看什么、再看什么、调用链怎么穿”的阅读地图。
+> 这份导图只回答一个问题：一次请求现在走到主线哪一步，下一步该去哪里追源码。
 
-## 1. 启动路径
+如果你还没抓稳主线，先回到 [学习路径页](./paths/README.md)。如果你是从 example 过来的，先看 [example 到源码的桥接页](./example-source-bridge.md)。
 
-先看这些文件：
+## 怎么使用这份导图
 
-- `main.tsx`
-- `setup.ts`
-- `entrypoints/`
-- `QueryEngine.ts`
+1. 先定位你现在站在主线的哪一步。
+2. 对照该步骤的输入 / 输出，确认这一步到底完成了什么。
+3. 只打开 1 到 2 个核心文件，并先搜 2 到 4 个 symbol。
+4. 沿着“下一步流向”继续，不要一开始横向散读所有子系统。
 
-要回答的问题：
+<a id="step-1-startup-routing"></a>
+## Step 1 — 启动 / 模式分流
 
-- CLI 参数在什么地方被解析
-- 什么时候决定进入 REPL、print、serve 等模式
-- 会话级别的初始化在什么阶段完成
+- **主线位置：** 用户输入 → 启动 / 模式分流
+- **输入：** CLI 参数、当前工作目录、配置 / 环境变量、运行模式选择
+- **输出：** 选定 entrypoint、完成基础 setup，并决定是进入交互式会话还是 headless / bridge / 其他运行面
+- **先看文件：**
+- [`claudecode_src/src/main.tsx`](../claudecode_src/src/main.tsx)
+- [`claudecode_src/src/setup.ts`](../claudecode_src/src/setup.ts)
+- [`claudecode_src/src/cli/print.ts`](../claudecode_src/src/cli/print.ts)
 
-建议搜索：
-
-- `main_entry`
+- **建议先搜的 symbol：**
+- `main`
 - `setup`
 - `runHeadless`
-- `createSyntheticOutputTool`
 
-## 2. 单轮查询主链路
+- **下一步流向：**
+进入 Step 2，真正把 prompt、history、tool context 送进 `query` / `queryLoop`。
 
-核心路径：
+<a id="step-2-enter-query-loop"></a>
+## Step 2 — 进入 `query` / `queryLoop`
 
-`QueryEngine.ts -> query.ts -> services/api/claude.ts -> tool execution -> query.ts`
+- **主线位置：** 启动完成 → 进入单轮请求主线
+- **输入：** 已经选好的运行模式、当前 session 状态、用户消息 / 初始消息、工具上下文
+- **输出：** `QueryEngine` 或 REPL 把一次 turn 交给 `query`，并启动 `queryLoop` 这条 async generator 主线
+- **先看文件：**
+- [`claudecode_src/src/QueryEngine.ts`](../claudecode_src/src/QueryEngine.ts)
+- [`claudecode_src/src/query.ts`](../claudecode_src/src/query.ts)
+- [`claudecode_src/src/screens/REPL.tsx`](../claudecode_src/src/screens/REPL.tsx)
 
-先抓住这些符号：
-
+- **建议先搜的 symbol：**
+- `QueryEngine`
 - `query`
 - `queryLoop`
+- `processInitialMessage`
+
+- **下一步流向：**
+进入 Step 3，看模型请求如何被发出，以及返回的 assistant 内容为什么会转成“继续对话”还是“调用工具”。
+
+<a id="step-3-model-output-tool-selection"></a>
+## Step 3 — 模型产出 / 工具选择
+
+- **主线位置：** `queryLoop` 内部 → 调模型 → 解析 streaming 事件 → 决定是否发起 `tool_use`
+- **输入：** 当前消息历史、system prompt、模型配置、可用工具集合
+- **输出：** assistant 文本块、`tool_use` 块、stop reason，以及继续下一步所需的事件流
+- **先看文件：**
+- [`claudecode_src/src/query.ts`](../claudecode_src/src/query.ts)
+- [`claudecode_src/src/services/api/claude.ts`](../claudecode_src/src/services/api/claude.ts)
+- [`claudecode_src/src/tools.ts`](../claudecode_src/src/tools.ts)
+- [`claudecode_src/src/Tool.ts`](../claudecode_src/src/Tool.ts)
+
+- **建议先搜的 symbol：**
 - `queryModelWithStreaming`
+- `getTools`
+- `buildTool`
 - `isWithheldMaxOutputTokens`
 
-这一段真正要理解的是：
+- **下一步流向：**
+如果模型产出 `tool_use`，进入 Step 4；如果直接形成可展示的 assistant 输出，则跳到 Step 6 / Step 7 看状态更新与退出条件。
 
-- 谁在驱动一轮调用
-- 事件是怎么从 API 流里转换出来的
-- 工具结果是怎么回到消息历史里的
-- 循环什么时候终止
+<a id="step-4-tool-execution"></a>
+## Step 4 — 工具执行
 
-## 3. 工具系统与权限路径
+- **主线位置：** 模型已经选中工具 → 权限检查 / 安全检查 → 实际执行工具
+- **输入：** `tool_use` blocks、tool registry、permission context、当前工作目录与安全策略
+- **输出：** 工具成功结果、拒绝结果、错误结果，最终都会变成可回流的 `tool_result`
+- **先看文件：**
+- [`claudecode_src/src/query.ts`](../claudecode_src/src/query.ts)
+- [`claudecode_src/src/tools.ts`](../claudecode_src/src/tools.ts)
+- [`claudecode_src/src/tools/BashTool/bashPermissions.ts`](../claudecode_src/src/tools/BashTool/bashPermissions.ts)
+- [`claudecode_src/src/tools/BashTool/bashSecurity.ts`](../claudecode_src/src/tools/BashTool/bashSecurity.ts)
 
-核心路径：
-
-`Tool.ts -> tools.ts -> tools/BashTool/* -> bashPermissions.ts -> bashSecurity.ts`
-
-先看：
-
-- 工具接口如何定义
-- 工具注册表如何装配
-- 哪些权限在工具层处理，哪些在上层处理
-
-建议搜索：
-
-- `buildTool`
-- `getTools`
+- **建议先搜的 symbol：**
 - `canUseTool`
-- `BASH_SECURITY_CHECK_IDS`
+- `checkBashSecurity`
+- `getCommandPermission`
+- `askPermission`
 
-## 4. UI / 状态 / REPL 路径
+- **下一步流向：**
+进入 Step 5，把工具结果重新插回同一轮 assistant 轨迹，准备下一次模型续跑。
 
-核心路径：
+<a id="step-5-tool-result-reentry"></a>
+## Step 5 — 工具结果回流到主线
 
-`bootstrap/state.ts -> screens/REPL.tsx -> components/* -> ink/*`
+- **主线位置：** 工具执行完成 → 结果写回消息历史 → 同一轮 `queryLoop` 继续推进
+- **输入：** 工具输出、拒绝 / 错误信息、已有 assistant trajectory
+- **输出：** 带 `tool_result` 的用户侧消息、更新后的 turn history，以及下一次模型调用的输入
+- **先看文件：**
+- [`claudecode_src/src/query.ts`](../claudecode_src/src/query.ts)
+- [`claudecode_src/src/services/api/claude.ts`](../claudecode_src/src/services/api/claude.ts)
+- [`claudecode_src/src/utils/contentArray.ts`](../claudecode_src/src/utils/contentArray.ts)
 
-要观察：
+- **建议先搜的 symbol：**
+- `tool_result`
+- `queryLoop`
+- `normalizeMessagesForAPI`
+- `insertBlockAfterToolResults`
 
-- 哪些东西被放进全局状态
-- 哪些东西故意不进全局状态
-- Ink/React 风格的终端渲染是如何组合出来的
+- **下一步流向：**
+Step 5 说的是同一轮控制流怎样继续：工具结果被塞回消息历史后，`queryLoop` 会回到 Step 3 继续请求模型。Step 6 不是另一条控制流，而是对这些同一批事件的 UI / state 观察面。
 
-建议搜索：
+<a id="step-6-state-ui-update"></a>
+## Step 6 — 状态 / UI 更新
 
+- **主线位置：** 每轮事件推进时，REPL 和全局状态把“现在发生了什么”呈现出来
+- **输入：** query events、消息历史、loading / permission / notification 状态、初始消息和命令入口
+- **输出：** 终端 UI 渲染、session state 更新、用户可见的消息 / 工具结果 / 交互提示
+- **先看文件：**
+- [`claudecode_src/src/bootstrap/state.ts`](../claudecode_src/src/bootstrap/state.ts)
+- [`claudecode_src/src/screens/REPL.tsx`](../claudecode_src/src/screens/REPL.tsx)
+- [`claudecode_src/src/components/Messages.tsx`](../claudecode_src/src/components/Messages.tsx)
+- [`claudecode_src/src/history.ts`](../claudecode_src/src/history.ts)
+
+- **建议先搜的 symbol：**
 - `DO NOT ADD MORE STATE HERE`
 - `REPL`
-- `App`
-- `render`
+- `processInitialMessage`
+- `setAppState`
 
-## 5. Context / Prompt Cache / Memory 路径
+- **下一步流向：**
+如果当前 turn 还在跑，继续跟 Step 3 / Step 5 的事件往前走；如果当前 turn 收束，就进入 Step 7 看是继续下一轮还是退出。
 
-核心路径：
+<a id="step-7-next-turn-or-exit"></a>
+## Step 7 — 下一轮 / 退出条件
 
-`constants/prompts.ts -> utils/context.ts -> utils/api.ts -> memdir/*`
+- **主线位置：** 一轮结束 → 判断是否继续、多轮上下文如何保住、退出前做什么收尾
+- **输入：** stop reason、累积 history、context trimming / prompt cache 状态、memory extraction 触发条件
+- **输出：** 进入下一轮用户输入、完成收尾后退出，或在后台做 memory / context 维护
+- **先看文件：**
+- [`claudecode_src/src/query.ts`](../claudecode_src/src/query.ts)
+- [`claudecode_src/src/constants/prompts.ts`](../claudecode_src/src/constants/prompts.ts)
+- [`claudecode_src/src/utils/context.ts`](../claudecode_src/src/utils/context.ts)
+- [`claudecode_src/src/memdir/memdir.ts`](../claudecode_src/src/memdir/memdir.ts)
+- [`claudecode_src/src/services/extractMemories/extractMemories.ts`](../claudecode_src/src/services/extractMemories/extractMemories.ts)
 
-这是 Claude Code 最容易被低估的一层，因为这里决定了：
-
-- prompt cache 命中率
-- 长对话是否还能继续
-- 记忆为什么不直接塞满系统提示词
-
-建议搜索：
-
+- **建议先搜的 symbol：**
 - `SYSTEM_PROMPT_DYNAMIC_BOUNDARY`
-- `context_1m_beta`
-- `MEMORY.md`
+- `CONTEXT_1M_BETA_HEADER`
 - `ENTRYPOINT_NAME`
+- `buildMemoryLines`
+- `extractMemories`
 
-## 6. 多 Agent / Structured Output 路径
+- **下一步流向：**
+如果用户继续输入，就回到 Step 2 再跑下一轮；如果 runtime 结束，就沿着当前模式退出；如果你要追主线外的扩展，再去看 [layers/README.md](./layers/README.md) 和 [source-navigation.md](./source-navigation.md)。
 
-核心路径：
+## 主线外但常见的延伸
 
-`tools/AgentTool/* -> tools/SyntheticOutputTool/* -> coordinator/coordinatorMode.ts`
-
-真正值得理解的不是“会不会多 Agent”，而是：
-
-- worker 为什么不用把所有中间状态暴露给 coordinator
-- structured output 边界为什么重要
-- 受限工具集如何限制子任务越权
-
-建议搜索：
-
-- `SYNTHETIC_OUTPUT_TOOL_NAME`
-- `createSyntheticOutputTool`
-- `ASYNC_AGENT_ALLOWED_TOOLS`
-
-## 7. 推荐阅读顺序
-
-### 如果你是初学者
-
-1. `l1-startup`
-2. `l2-agent-loop`
-3. `l3-tool-system`
-4. `l7-permissions`
-5. `l8-streaming`
-6. `l9-context`
-
-### 如果你已经做过 Agent
-
-1. `query.ts`
-2. `services/api/claude.ts`
-3. `bashSecurity.ts`
-4. `constants/prompts.ts`
-5. `memdir/memdir.ts`
-6. `coordinatorMode.ts`
-
-## 8. 进阶深挖专题
-
-- [L10 QueryEngine 与系统 Prompt 拼装](./layers/l10-query-engine.md)
-- [L11 API Streaming 与事件模型](./layers/l11-api-streaming.md)
-- [L12 REPL 主界面与输入系统](./layers/l12-repl-ui.md)
-- [L13 MCP / Hooks / Plugins 扩展面](./layers/l13-mcp-hooks-plugins.md)
-- [L14 Memory 提取与 Team Memory](./layers/l14-memory-system.md)
-- [L15 Print / Serve / Bridge 等运行模式](./layers/l15-runtime-modes.md)
-
-## 9. 搭配阅读
-
-- 哲学总结：[`../PHILOSOPHY.MD`](../PHILOSOPHY.MD)
-- 导航手册：[`source-navigation.md`](./source-navigation.md)
-- 文章路线：[`articles/series.md`](./articles/series.md)
-- Layer 文档：[`layers/README.md`](./layers/README.md)
+- 想看多 agent / structured output 怎么挂到主线上：先读 [L6 高级机制](./layers/l6-advanced.md)
+- 想看 memory / context 为什么影响“能不能继续下一轮”：先读 [L14 Memory 提取与 Team Memory](./layers/l14-memory-system.md)
+- 想看 runtime modes 为什么改变入口但不改主线核心：先读 [L15 Print / Serve / Bridge 等运行模式](./layers/l15-runtime-modes.md)
