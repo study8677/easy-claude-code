@@ -2,133 +2,131 @@
 
 [中文](./README.MD) | English
 
-> A source-reading tutorial repo for Claude Code: runnable examples for intuition, plus real call-chain analysis for deeper architectural understanding.
+> A source-reading tutorial repo for Claude Code: first understand how one request moves through the system, then use examples, path pages, and the real call chain to understand the architecture.
 
-## What This Repo Is
+## The one request flow to keep in mind
 
-This repo is organized around two learning paths:
+The first goal of this repo is not to memorize every layer, and not to read every document on day one.
 
-- `Quick Understanding`: run examples first and build intuition for startup, the agent loop, tools, and permissions.
-- `Deep Source Dive`: follow the real TypeScript call chain, key symbols, and design decisions in the source.
+Start with the path of **one Claude Code request**:
 
-The repository has four layers of material:
+**user input → startup / mode routing → enter `query` / `queryLoop` → model output → tool call → tool execution → tool result flows back → state / UI update → next turn or exit**
 
-- `examples/`: 9 runnable Python examples for intuition
-- [docs/source-map.en.md](./docs/source-map.en.md): the global source call-chain map
-- `docs/layers/`: bilingual deep-dive notes for each layer
+Once that flow is clear, permissions, memory, runtime modes, skills, and coordinators become supporting structures instead of disconnected topics.
+
+## What to ignore for now
+
+On the first pass, do **not** make these your main focus yet:
+
+- do not start by reading `claudecode_src/src/` linearly
+- do not treat all of `docs/layers/` as the main course on day one
+- do not dive into multi-agent flows, memory systems, runtime modes, or plugin boundaries first
+- do not try to memorize every file name; first learn where the request goes next
+
+If you can answer “which part of the request flow am I looking at right now?”, you are learning the right thing first.
+
+## What each set of materials is for
+
+- `examples/`: 9 runnable Python examples that turn the request flow into observable slices
+- [`docs/paths/`](./docs/paths/README.en.md): the main study route; explains what to learn in P1-P4
+- [`docs/example-source-bridge.en.md`](./docs/example-source-bridge.en.md): connects examples, request-flow positions, source-map sections, and real files
+- [docs/source-map.en.md](./docs/source-map.en.md): traces the main call chain and its key branches
+- `docs/layers/`: deep-dive notes for when one part of the flow still feels fuzzy
+
+Supporting material:
+
 - [PHILOSOPHY_EN.MD](./PHILOSOPHY_EN.MD): design philosophy and engineering trade-offs
+- [docs/source-navigation.en.md](./docs/source-navigation.en.md): symbol-search guide
+- [docs/exercises.en.md](./docs/exercises.en.md): study exercises
+- [docs/faq.en.md](./docs/faq.en.md): frequently asked questions
 
-`claudecode_src/` is for local study only and is gitignored.
+## Where the 9 examples fit in the request flow
 
-## Where To Start
+| Example | Request-flow position | What to notice |
+|---|---|---|
+| `l1_startup.py` | user input → startup / routing | how the CLI enters the correct run mode and establishes session / entry context |
+| `l2_agent_loop.py` | enter `queryLoop` → one turn advances | how one request drives model work, tool use, and exit conditions |
+| `l3_tool_system.py` | model output → tool call | why tools are schema plus execute instead of arbitrary JSON |
+| `l4_ui_ink.py` | state / UI update | how the terminal UI reflects the current request-flow state |
+| `l5_state_commands.py` | state organization / command entry | how state objects and command entrypoints support multi-turn work |
+| `l6_advanced.py` | extension boundaries outside the core flow | how coordinators, cost tracking, and skills hang off the core path |
+| `l7_permissions.py` | gate before tool execution | how the permission system intervenes before a tool actually runs |
+| `l8_streaming.py` | how the flow is carried over time | why the core abstraction is closer to an async generator / event stream |
+| `l9_context_mgmt.py` | keeping multi-turn execution alive | how context management keeps the request flow from drifting or exploding |
 
-### Track A: Quick Understanding
+## Start in 5 minutes
 
-1. Run `python examples/l1_startup.py`
-2. Read [docs/layers/l1-startup.en.md](./docs/layers/l1-startup.en.md)
-3. Continue with `l2`, `l3`, and `l7` to build intuition for the loop, tools, and permissions
-4. Return to [PHILOSOPHY_EN.MD](./PHILOSOPHY_EN.MD) to understand the reasoning behind the design
+### Track A: No API Key Required
 
-### Track B: Deep Source Dive
+Install the minimal dependency set:
 
-1. Start with [docs/source-map.en.md](./docs/source-map.en.md)
-2. Then read `l2 -> l8 -> l7 -> l9 -> l6`
-3. Search these symbols directly in `claudecode_src/src/`:
-   - `query`
-   - `queryLoop`
-   - `SYSTEM_PROMPT_DYNAMIC_BOUNDARY`
-   - `BASH_SECURITY_CHECK_IDS`
-   - `SyntheticOutputTool`
+```bash
+pip install openai python-dotenv
+```
 
-## Quick Warm-Up
+Then run:
+
+```bash
+python examples/l1_startup.py
+python examples/l3_tool_system.py
+python examples/l7_permissions.py
+```
+
+You will see:
+
+- `l1_startup.py`: how a request actually enters the system
+- `l3_tool_system.py`: why the model does not “just do tools,” but has to go through schema plus execute
+- `l7_permissions.py`: why tool execution passes through a permission gate first
+
+Go next to:
+
+- [Learning path: P1 First Hour](./docs/paths/p1-first-hour.en.md)
+
+### Track B: You Have An API Key And Want To See The Core Loop First
 
 ```bash
 pip install openai python-dotenv
 export DEEPSEEK_API_KEY=your_key
 
-python examples/l1_startup.py
-python examples/l1_startup.py --print "hello"
-python examples/l1_startup.py serve
+python examples/l2_agent_loop.py
+python examples/l8_streaming.py
 ```
 
-If you do not have an API key yet, you can still learn a lot from the offline layers:
+You will see:
 
-- `l1_startup.py`
-- `l3_tool_system.py`
-- `l4_ui_ink.py`
-- `l5_state_commands.py`
-- `l6_advanced.py`
-- `l7_permissions.py`
-- `l9_context_mgmt.py`
+- `l2_agent_loop.py`: how one request moves through model calls, tool execution, result flow-back, and exit
+- `l8_streaming.py`: why the main flow is not just one function call, but an ongoing event stream
 
-## 9-Layer Learning Map
+Go next to:
 
-| Layer | Run First | Key Source | What You Should Actually Learn |
-|---|---|---|---|
-| L1 Startup & Entry | `examples/l1_startup.py` | `main.tsx`, `setup.ts`, `entrypoints/` | How Claude Code boots, dispatches modes, and creates a session |
-| L2 Agent Loop | `examples/l2_agent_loop.py` | `query.ts`, `QueryEngine.ts` | How tool calls drive the main loop and how the loop exits |
-| L3 Tool System | `examples/l3_tool_system.py` | `Tool.ts`, `tools.ts`, `tools/*/` | Why tools are schema plus execution, not magic |
-| L4 UI / Ink | `examples/l4_ui_ink.py` | `components/`, `ink.ts` | Why terminal UI can behave like React |
-| L5 State & Commands | `examples/l5_state_commands.py` | `state/`, `commands/`, `history.ts` | How history, user settings, and slash commands are organized |
-| L6 Advanced Mechanisms | `examples/l6_advanced.py` | `skills/`, `coordinator/`, `memdir/` | The boundaries of skills, multi-agent orchestration, memory, and cost tracking |
-| L7 Permissions | `examples/l7_permissions.py` | `bashPermissions.ts`, `bashSecurity.ts` | Why Claude Code uses a 3-layer permission model |
-| L8 Streaming | `examples/l8_streaming.py` | `query.ts`, `services/api/claude.ts` | Why async generators are the core streaming abstraction |
-| L9 Context Management | `examples/l9_context_mgmt.py` | `utils/context.ts`, `constants/prompts.ts` | How Claude Code protects context budget and prompt cache hit rate |
+- [Learning path: P2 Core Loop](./docs/paths/p2-core-loop.en.md)
 
-See the deep-dive notes in:
+## After this page, where should you go next?
 
-- Chinese index: [`docs/layers/README.md`](./docs/layers/README.md)
-- English index: [`docs/layers/README.en.md`](./docs/layers/README.en.md)
+- Want the staged learning route? Read [Learning Paths (English)](./docs/paths/README.en.md)
+- Want to know where to go after a specific example? Read [Example-To-Source Bridge](./docs/example-source-bridge.en.md)
+- Want to trace the real call chain? Read [Source Map](./docs/source-map.en.md)
+- Want to search concrete symbols in the source? Read [Source Navigation Guide](./docs/source-navigation.en.md)
 
-## Essential Maps And Deep Dives
+## What `claudecode_src/` actually is
 
-- [Source Map (English)](./docs/source-map.en.md)
-- [源码导图（中文）](./docs/source-map.md)
+`claudecode_src/` is a local study mirror of Claude Code source.
+
+Important points:
+
+- the teaching docs and Python examples can still be read independently
+- the full “compare tutorial to real source” workflow assumes you have `claudecode_src/` locally
+- `examples/` are pedagogical mappings, not line-by-line recreations of the real codebase
+- `claudecode_src/` is gitignored and will not be published with this tutorial repo
+
+## Go deeper
+
 - [Layer Deep-Dive Index (English)](./docs/layers/README.en.md)
 - [Layer 深挖目录（中文）](./docs/layers/README.md)
 - [Design Philosophy (English)](./PHILOSOPHY_EN.MD)
 - [设计哲学（中文）](./PHILOSOPHY.MD)
-- [Source Navigation Guide (English)](./docs/source-navigation.en.md)
-- [源码导航手册（中文）](./docs/source-navigation.md)
-- [Study Exercises (English)](./docs/exercises.en.md)
-- [学习练习册（中文）](./docs/exercises.md)
-- [FAQ (English)](./docs/faq.en.md)
-- [FAQ（中文）](./docs/faq.md)
 - [Article Roadmap (English)](./docs/articles/series.en.md)
 - [文章选题路线（中文）](./docs/articles/series.md)
-
-## Advanced Deep-Dive Topics
-
-Once you finish the 9 example layers, continue with these source-heavy topics:
-
-- [L10 QueryEngine And System Prompt Assembly](./docs/layers/l10-query-engine.en.md)
-- [L11 API Streaming And The Event Model](./docs/layers/l11-api-streaming.en.md)
-- [L12 The REPL Screen And Input System](./docs/layers/l12-repl-ui.en.md)
-- [L13 MCP, Hooks, And Plugins](./docs/layers/l13-mcp-hooks-plugins.en.md)
-- [L14 Memory Extraction And Team Memory](./docs/layers/l14-memory-system.en.md)
-- [L15 Print, Serve, Bridge, And Other Runtime Modes](./docs/layers/l15-runtime-modes.en.md)
-
-## Setup
-
-```bash
-pip install openai python-dotenv
-
-# DeepSeek (recommended, compatible with l2 / l8)
-export DEEPSEEK_API_KEY=your_key
-export DEEPSEEK_MODEL=deepseek-chat   # optional
-```
-
-Examples that require an API key:
-
-- `examples/l2_agent_loop.py`
-- `examples/l8_streaming.py`
-
-## How To Read This Repo Well
-
-- If you are new: run the examples first, then read the layer notes, then search symbols in the source
-- If you already build agents: start with the source map, then walk the call chains directly
-- Do not read `claudecode_src/src/` linearly
-- After each layer, explain to yourself what concrete engineering problem it solves
 
 ## Disclaimer
 

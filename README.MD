@@ -2,133 +2,131 @@
 
 [English](./README_EN.MD) | 中文
 
-> 一个面向源码学习的 Claude Code 教程仓库：既能带你跑通直觉，也能带你顺着真实调用链深入架构。
+> 一个面向源码学习的 Claude Code 教程仓库：先抓住“一次请求如何流动”的主线，再顺着示例、路径页和真实调用链把架构读透。
 
-## 这是什么
+## 你现在要抓的唯一主线
 
-这个仓库把 Claude Code 的学习拆成两条路线：
+这个仓库的第一目标，不是记住所有层，也不是一开始就把所有文档全部看完。
 
-- `快速理解 Claude Code`：先跑示例，建立启动、Agent Loop、工具系统和权限模型的直觉。
-- `深入源码分析`：按真实文件、关键符号和设计决策去读 TypeScript 源码。
+你先要抓住 Claude Code 里 **一次请求如何流动**：
 
-仓库内容分四层：
+**用户输入 → 启动 / 模式分流 → 进入 `query` / `queryLoop` → 模型产出 → 工具调用 → 工具执行 → 工具结果回流 → 状态 / UI 更新 → 下一轮或退出**
 
-- `examples/`：9 个可运行 Python 示例，用来建立直觉
-- [docs/source-map.md](./docs/source-map.md)：源码调用链总导图
-- `docs/layers/`：每一层的中英双语深挖文档
+只要这条主线稳定了，后面的 permissions、memory、runtime modes、skills、coordinator 才会有位置感。
+
+## 现在先不要试图同时理解什么
+
+第一轮学习里，先不要把这些当成主战场：
+
+- 不要一上来线性硬啃 `claudecode_src/src/`
+- 不要先把 `docs/layers/` 当成主线课程
+- 不要先钻进多 Agent、memory、runtime modes、插件边界
+- 不要试图一次性记住所有文件名；先记住“请求下一步会流向哪里”
+
+如果你暂时只能稳定回答“这次请求现在位于主线哪一段”，你就走在正确方向上。
+
+## 这个仓库里每类材料是干什么的
+
+- `examples/`：9 个可运行 Python 示例，把主线拆成可观察切片
+- [`docs/paths/`](./docs/paths/README.md)：正式学习路线；告诉你 P1-P4 每阶段只学什么
+- [`docs/example-source-bridge.md`](./docs/example-source-bridge.md)：把示例、主线位置、source-map 和真实源码对起来
+- [docs/source-map.md](./docs/source-map.md)：按调用链追踪主线与关键分支
+- `docs/layers/`：当你在某个环节卡住时，用来补细节与边界感
+
+补充材料：
+
 - [PHILOSOPHY.MD](./PHILOSOPHY.MD)：设计哲学与工程权衡总结
+- [docs/source-navigation.md](./docs/source-navigation.md)：源码符号搜索手册
+- [docs/exercises.md](./docs/exercises.md)：练习册
+- [docs/faq.md](./docs/faq.md)：常见问题
 
-`claudecode_src/` 仅供本地研究，已加入 `.gitignore`，不会随本仓库上传。
+## 9 个 examples 在主线中的位置
 
-## 先从哪开始
+| Example | 主线位置 | 读者要抓住什么 |
+|---|---|---|
+| `l1_startup.py` | 用户输入 → 启动 / 分流 | CLI 如何进入正确运行模式，并建立 session / 入口上下文 |
+| `l2_agent_loop.py` | 进入 `queryLoop` → 单轮请求推进 | 一轮请求怎样驱动模型、工具与退出条件 |
+| `l3_tool_system.py` | 模型产出 → 工具调用 | 工具为什么是 schema + execute，而不是随意 JSON |
+| `l4_ui_ink.py` | 状态 / UI 更新 | 终端 UI 怎样把主线当前状态显示出来 |
+| `l5_state_commands.py` | 状态组织 / 命令入口 | 状态对象与命令入口怎样支撑多轮对话 |
+| `l6_advanced.py` | 主线外的扩展边界 | coordinator / cost / skills 这类扩展怎样挂在主线周围 |
+| `l7_permissions.py` | 工具执行前的关口 | 权限系统怎样在工具真正执行前介入 |
+| `l8_streaming.py` | 主线的贯穿方式 | 为什么核心抽象更像 async generator / 事件流 |
+| `l9_context_mgmt.py` | 多轮持续运行 | context 管理如何保护主线继续前进而不失控 |
 
-### 路线 A：快速理解 Claude Code
+## 5 分钟开始
 
-1. 运行 `python examples/l1_startup.py`
-2. 阅读 [docs/layers/l1-startup.md](./docs/layers/l1-startup.md)
-3. 继续跑 `l2`、`l3`、`l7`，先建立 loop、工具和权限直觉
-4. 最后回看 [PHILOSOPHY.MD](./PHILOSOPHY.MD)，理解“为什么这样设计”
+### 路线 A：无需 API Key
 
-### 路线 B：深入源码分析
+先安装依赖：
 
-1. 先读 [docs/source-map.md](./docs/source-map.md)
-2. 再读 `l2 -> l8 -> l7 -> l9 -> l6`
-3. 边读边在 `claudecode_src/src/` 中搜索关键符号：
-   - `query`
-   - `queryLoop`
-   - `SYSTEM_PROMPT_DYNAMIC_BOUNDARY`
-   - `BASH_SECURITY_CHECK_IDS`
-   - `SyntheticOutputTool`
+```bash
+pip install openai python-dotenv
+```
 
-## 快速热身
+然后运行：
+
+```bash
+python examples/l1_startup.py
+python examples/l3_tool_system.py
+python examples/l7_permissions.py
+```
+
+你会看到：
+
+- `l1_startup.py`：请求怎样真正进入系统
+- `l3_tool_system.py`：模型为什么不会“直接做工具”，而要走 schema + execute
+- `l7_permissions.py`：工具执行前为什么要经过权限关口
+
+下一步直接去：
+
+- [学习路径：P1 第一个小时](./docs/paths/p1-first-hour.md)
+
+### 路线 B：有 API Key，想先看到核心 loop
 
 ```bash
 pip install openai python-dotenv
 export DEEPSEEK_API_KEY=你的key
 
-python examples/l1_startup.py
-python examples/l1_startup.py --print "hello"
-python examples/l1_startup.py serve
+python examples/l2_agent_loop.py
+python examples/l8_streaming.py
 ```
 
-如果你没有 API Key，也可以先学习这些无需联网的层：
+你会看到：
 
-- `l1_startup.py`
-- `l3_tool_system.py`
-- `l4_ui_ink.py`
-- `l5_state_commands.py`
-- `l6_advanced.py`
-- `l7_permissions.py`
-- `l9_context_mgmt.py`
+- `l2_agent_loop.py`：一轮请求如何推进模型调用、工具执行、结果回写与退出
+- `l8_streaming.py`：为什么主线不是单点函数调用，而更像持续事件流
 
-## 9 层学习地图
+下一步直接去：
 
-| Layer | 先跑什么 | 重点源码 | 这一层真正要学什么 |
-|---|---|---|---|
-| L1 启动与入口 | `examples/l1_startup.py` | `main.tsx`, `setup.ts`, `entrypoints/` | Claude Code 如何启动、分流、建立会话 |
-| L2 Agent Loop | `examples/l2_agent_loop.py` | `query.ts`, `QueryEngine.ts` | 工具调用如何进入循环并退出 |
-| L3 工具系统 | `examples/l3_tool_system.py` | `Tool.ts`, `tools.ts`, `tools/*/` | 工具为什么是 schema + 执行函数 |
-| L4 UI / Ink | `examples/l4_ui_ink.py` | `components/`, `ink.ts` | 终端 UI 为什么能像 React 一样重渲染 |
-| L5 状态与命令 | `examples/l5_state_commands.py` | `state/`, `commands/`, `history.ts` | 消息历史、用户设置、斜杠命令如何组织 |
-| L6 高级机制 | `examples/l6_advanced.py` | `skills/`, `coordinator/`, `memdir/` | 技能、多 Agent、记忆、费用统计的边界 |
-| L7 权限系统 | `examples/l7_permissions.py` | `bashPermissions.ts`, `bashSecurity.ts` | 为什么权限设计是三层，而不是一次询问 |
-| L8 Streaming | `examples/l8_streaming.py` | `query.ts`, `services/api/claude.ts` | 为什么核心抽象是 async generator |
-| L9 Context 管理 | `examples/l9_context_mgmt.py` | `utils/context.ts`, `constants/prompts.ts` | Claude Code 如何保住上下文和 prompt cache |
+- [学习路径：P2 Core Loop](./docs/paths/p2-core-loop.md)
 
-对应的双语深挖文档见：
+## 读完首页后，下一步去哪
 
-- 中文索引：[`docs/layers/README.md`](./docs/layers/README.md)
-- 英文索引：[`docs/layers/README.en.md`](./docs/layers/README.en.md)
+- 想按阶段学：看 [学习路径（中文）](./docs/paths/README.md)
+- 想知道“某个示例之后去读哪里”：看 [example 到源码的桥接页](./docs/example-source-bridge.md)
+- 想直接追真实调用链：看 [源码导图](./docs/source-map.md)
+- 想在源码里搜索 symbol：看 [源码导航手册](./docs/source-navigation.md)
 
-## 必读导图与深挖
+## `claudecode_src/` 到底是什么
 
-- [源码导图（中文）](./docs/source-map.md)
-- [Source Map (English)](./docs/source-map.en.md)
+`claudecode_src/` 是本地研究用的 Claude Code 源码镜像。
+
+需要明确几点：
+
+- 这个仓库的教学文档和 Python 示例本身可以独立阅读
+- 真正的“对照源码阅读”依赖你本地存在 `claudecode_src/`
+- `examples/` 不是逐行复刻源码，而是“保留架构形状的教学版映射”
+- `claudecode_src/` 已加入 `.gitignore`，不会跟随这个教程仓库公开上传
+
+## 继续深入
+
 - [Layer 深挖目录（中文）](./docs/layers/README.md)
 - [Layer Deep-Dive Index (English)](./docs/layers/README.en.md)
 - [设计哲学（中文）](./PHILOSOPHY.MD)
 - [Design Philosophy (English)](./PHILOSOPHY_EN.MD)
-- [源码导航手册（中文）](./docs/source-navigation.md)
-- [Source Navigation Guide (English)](./docs/source-navigation.en.md)
-- [学习练习册（中文）](./docs/exercises.md)
-- [Study Exercises (English)](./docs/exercises.en.md)
-- [FAQ（中文）](./docs/faq.md)
-- [FAQ (English)](./docs/faq.en.md)
 - [文章选题路线（中文）](./docs/articles/series.md)
 - [Article Roadmap (English)](./docs/articles/series.en.md)
-
-## 进阶深挖专题
-
-如果你已经走完 9 层示例，下一步建议直接读这些专题：
-
-- [L10 QueryEngine 与系统 Prompt 拼装](./docs/layers/l10-query-engine.md)
-- [L11 API Streaming 与事件模型](./docs/layers/l11-api-streaming.md)
-- [L12 REPL 主界面与输入系统](./docs/layers/l12-repl-ui.md)
-- [L13 MCP / Hooks / Plugins 扩展面](./docs/layers/l13-mcp-hooks-plugins.md)
-- [L14 Memory 提取与 Team Memory](./docs/layers/l14-memory-system.md)
-- [L15 Print / Serve / Bridge 等运行模式](./docs/layers/l15-runtime-modes.md)
-
-## 环境配置
-
-```bash
-pip install openai python-dotenv
-
-# DeepSeek（推荐，与 l2 / l8 示例兼容）
-export DEEPSEEK_API_KEY=你的key
-export DEEPSEEK_MODEL=deepseek-chat   # 可选
-```
-
-需要 API Key 的示例：
-
-- `examples/l2_agent_loop.py`
-- `examples/l8_streaming.py`
-
-## 适合怎么读
-
-- 初学者：先跑，再看 layer 文档，再去源码里搜符号
-- 有 Agent 经验的读者：先读 source map，再按调用链穿透源码
-- 不要线性硬啃 `claudecode_src/src/`，而是带着问题阅读
-- 每看完一层，都尝试用自己的话解释“它解决了什么工程问题”
 
 ## 免责声明
 
