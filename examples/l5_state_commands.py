@@ -24,6 +24,12 @@ Layer 5 — 状态管理 & 斜杠命令
 运行后请回答：
   - 为什么 slash command 更像命令注册表，而不是特殊语法？
   - 哪些状态应该进 store，哪些不应该？
+
+跑完后下一步：
+  1. 读 docs/layers/l5-state-commands.md
+  2. 看 docs/source-map.md 的“UI / 状态 / REPL 路径”
+  3. 搜 `history`、`commands`、`processInitialMessage`
+  4. 先开 `history.ts`、`commands/` 和 `screens/REPL.tsx`
 """
 
 from dataclasses import dataclass, replace
@@ -239,3 +245,16 @@ if __name__ == "__main__":
             store.set(lambda s: replace(s, cost_usd=s.cost_usd + 0.0002))
             add_message(store, "assistant", f"(模拟回复 '{text}')")
             print()
+
+
+# ═══════════════════════════════════════════════════════════
+# 自检问题（跑完后回答，不要查代码）
+# ═══════════════════════════════════════════════════════════
+#
+# 1. /model、/cost 这类斜杠命令为什么在发给模型之前就被拦截处理？
+#    如果让模型来解析斜杠命令，会有什么问题？
+#
+# 2. AppStateStore 为什么用 replace(s, field=value) 的不可变方式更新，
+#    而不是直接 s.field = value？
+#
+# 3. 如果现在要加一个 /export 命令，你会在哪个文件的哪个位置添加？

@@ -22,5 +22,8 @@ build/
 *.swp
 *.swo
 
+# 工具日志
+.omx/
+
 # 依赖
 node_modules/

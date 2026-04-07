@@ -4,7 +4,7 @@
 
 ## 1. 我不懂 TypeScript，能读这个仓库吗？
 
-可以。先跑 `examples/` 建立直觉，再看 `docs/layers/`。目标不是一上来读懂所有语法，而是先知道每个模块在解决什么问题。
+可以。先跑 `examples/` 建立直觉，再看 `docs/layers/`，然后用 `docs/source-map.md` 和 `docs/source-navigation.md` 把直觉接到源码上。目标不是一上来读懂所有语法，而是先知道每个模块在解决什么问题。
 
 ## 2. 我没有 API Key，哪些内容还能学？
 
@@ -16,7 +16,7 @@
 
 ## 4. 先看 QueryEngine，还是先看 query.ts？
 
-初学者先看 `query.ts`，先理解 loop。进阶读者再去 `QueryEngine.ts`，理解系统 Prompt、skills、plugins、slash commands 如何在进入 loop 前被组装。
+初学者先看 `query.ts`，先理解 loop。进阶读者再去 `QueryEngine.ts`，理解系统 Prompt、skills、plugins、slash commands 如何在进入 loop 前被组装。最稳的顺序仍然是：example -> layer -> source map -> 源码导航。
 
 ## 5. 为什么仓库里既有 9 层，又有 L10-L15？
 
@@ -24,7 +24,7 @@
 
 ## 6. 这个仓库的最佳阅读方式是什么？
 
-先跑一个 example，再读对应 layer 文档，然后去 `claudecode_src/src/` 搜里面列出的关键符号。不要先把源码从头翻到尾。如果你容易在源码里迷路，直接配合 [源码导航手册](./source-navigation.md) 一起看。
+优先从 [学习路径页](./paths/README.md) 开始，按 `P1 -> P2 -> P3 -> P4` 走。每到一个阶段，再去跑 example、读对应 layer 文档、看 [源码导图](./source-map.md)、搜索关键符号。不要先把源码从头翻到尾。如果你容易在源码里迷路，直接配合 [源码导航手册](./source-navigation.md) 一起看。
 
 ## 7. 想把“看懂”变成“真的会分析”，应该做什么？
 

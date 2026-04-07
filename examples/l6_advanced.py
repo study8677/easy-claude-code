@@ -28,6 +28,12 @@ Layer 6 — 高级机制：技能 / 多 Agent 协调 / 费用追踪
 运行后请回答：
   - 技能、工具、命令分别在解决什么问题？
   - 为什么 coordinator 和 worker 之间要有 structured output 边界？
+
+跑完后下一步：
+  1. 读 docs/layers/l6-advanced.md
+  2. 看 docs/source-map.md 的“多 Agent / Structured Output 路径”
+  3. 搜 `SYNTHETIC_OUTPUT_TOOL_NAME`、`createSyntheticOutputTool`、`ASYNC_AGENT_ALLOWED_TOOLS`
+  4. 先开 `tools/SyntheticOutputTool/*` 和 `coordinator/coordinatorMode.ts`
 """
 
 import re
@@ -247,9 +253,9 @@ if __name__ == "__main__":
     w3 = coordinator.spawn_worker("列出 examples/ 目录结构", tools=["bash", "read_file"])
 
     # 并行执行（真实版用 asyncio）
-    coordinator.run_worker(w1, "README 包含 6 个学习层级，从启动到高级机制")
+    coordinator.run_worker(w1, "README 以 9 个可运行示例为主线，配套 paths/layers/source-map 学习材料")
     coordinator.run_worker(w2, "所有 Python 文件语法检查通过")
-    coordinator.run_worker(w3, "examples/ 包含 l1~l6 共 6 个示例文件")
+    coordinator.run_worker(w3, "examples/ 包含 l1~l9 共 9 个示例文件")
 
     print(f"\n[coordinator] 汇总结果:\n{coordinator.collect_results()}")
     print()
@@ -270,3 +276,17 @@ if __name__ == "__main__":
         t = CostTracker(model=model)
         t.record(2100, 450)
         print(f"  {model:30s} ${t.total_cost_usd():.6f}")
+
+
+# ═══════════════════════════════════════════════════════════
+# 自检问题（跑完后回答，不要查代码）
+# ═══════════════════════════════════════════════════════════
+#
+# 1. 技能（Skill）和斜杠命令（/model、/cost）的本质区别是什么？
+#    技能的 prompt 是在哪一步被注入主循环的？
+#
+# 2. 费用追踪器在主线中处于哪一层？
+#    它是从哪里拿到 input_tokens / output_tokens 数值的？
+#
+# 3. 协调者（Coordinator）为什么只能看到 SyntheticOutput，
+#    而不能直接观察子 agent 的中间消息历史？

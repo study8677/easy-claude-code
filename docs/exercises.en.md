@@ -4,13 +4,18 @@
 
 > These exercises are not meant to make you read every file. The goal is to enter the codebase with a question and leave with evidence.
 
+They are not only for beginners: new readers can use them to connect examples to source, while experienced readers can use them to check whether they can explain the boundary instead of just repeating the concept.
+
 ## How To Use This
 
 1. Run one example or read one layer note first.
-2. Do only one or two exercises for the current topic.
-3. When you answer, write down the symbols you searched and the files you checked.
+2. Then open the matching source map and confirm which call chain you are following.
+3. Do only one or two exercises for the current topic.
+4. When you answer, write down the symbols you searched and the files you checked.
 
 ## Exercise 1: Trace One Minimal Call Chain
+
+Recommended stage: `P2`
 
 Goal: follow one user input all the way to model execution and back to the final answer.
 
@@ -30,6 +35,8 @@ Done when:
 
 ## Exercise 2: Explain Why QueryEngine Is Not Redundant
 
+Recommended stage: `P3`
+
 Goal: understand what QueryEngine adds beyond "just one more wrapper."
 
 Steps:
@@ -46,6 +53,8 @@ Done when:
 - Your answer uses at least two of these ideas: `system prompt assembly`, `session state`, `slash commands`.
 
 ## Exercise 3: Draw The Boundary Between Tools And Permissions
+
+Recommended stage: `P2`
 
 Goal: stop treating "tool calls" and "safety approval" as the same layer.
 
@@ -66,6 +75,8 @@ Done when:
 
 ## Exercise 4: Explain Why Streaming Is Not Just A Callback
 
+Recommended stage: `P2`
+
 Goal: understand the engineering value of async generators.
 
 Steps:
@@ -85,6 +96,8 @@ Done when:
 
 ## Exercise 5: Find The REPL State Boundary
 
+Recommended stage: `P3`
+
 Goal: understand why the terminal UI is not just one giant component.
 
 Steps:
@@ -103,6 +116,8 @@ Done when:
 
 ## Exercise 6: Explain The Relationship Between Prompt Cache And Memory
 
+Recommended stage: `P4`
+
 Goal: avoid treating memory as "just put more text into the system prompt."
 
 Steps:
@@ -119,6 +134,8 @@ Done when:
 - Your answer clearly separates context management, prompt cache, and memory extraction.
 
 ## Exercise 7: Compare REPL And Non-REPL Runtime Modes
+
+Recommended stage: `P4`
 
 Goal: understand that Claude Code is not only an interactive terminal shell.
 
@@ -139,7 +156,7 @@ Done when:
 
 ## After You Finish These
 
-If you can finish the first four exercises, these documents become much more useful:
+If you can finish the first four exercises, you have already moved from “understanding examples” to “reading source.” These documents become much more useful:
 
 - [Source Navigation Guide](./source-navigation.en.md)
 - [Layer Deep-Dive Index](./layers/README.en.md)

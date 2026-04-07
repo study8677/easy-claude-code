@@ -17,6 +17,12 @@ Layer 1 — 启动与入口
 运行后请回答：
   - 启动路径和 query 路径是在什么地方接起来的？
   - 为什么模式分流要发生在真正进入 Agent Loop 之前？
+
+跑完后下一步：
+  1. 读 docs/paths/p1-first-hour.md
+  2. 看 docs/source-map.md 的“启动路径”
+  3. 搜 `main_entry`、`setup`、`runHeadless`
+  4. 先开 `main.tsx` 和 `setup.ts`
 """
 
 import sys
@@ -145,3 +151,15 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# ═══════════════════════════════════════════════════════════
+# 自检问题（跑完后回答，不要查代码）
+# ═══════════════════════════════════════════════════════════
+#
+# 1. setup() 在什么时候被调用？在第一轮模型请求之前还是之后？
+#
+# 2. 为什么模式分流要发生在进入 Agent Loop 之前，而不是在 loop 内部判断？
+#
+# 3. session_id 是在哪一步创建的？如果两次运行不同的 session_id，
+#    Claude Code 能否跨 session 共享对话历史？

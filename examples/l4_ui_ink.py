@@ -24,6 +24,12 @@ Layer 4 — UI 层（Ink/React）
 运行后请回答：
   - 为什么终端 UI 也适合做声明式渲染？
   - 如果没有状态驱动重绘，工具进度会出什么问题？
+
+跑完后下一步：
+  1. 读 docs/paths/p1-first-hour.md 或 docs/layers/l4-ui-ink.md
+  2. 看 docs/source-map.md 的“UI / 状态 / REPL 路径”
+  3. 搜 `REPL`、`render`、`DO NOT ADD MORE STATE HERE`
+  4. 先开 `bootstrap/state.ts` 和 `screens/REPL.tsx`
 """
 
 import sys
@@ -211,3 +217,16 @@ if __name__ == "__main__":
         demo()
     except KeyboardInterrupt:
         print()
+
+
+# ═══════════════════════════════════════════════════════════
+# 自检问题（跑完后回答，不要查代码）
+# ═══════════════════════════════════════════════════════════
+#
+# 1. Ink 渲染到的是什么？它和浏览器 DOM 最本质的区别是什么？
+#
+# 2. AppState 发生变化时，是谁来触发 UI 重新渲染？
+#    （提示：看 on_change 回调和渲染函数的关系）
+#
+# 3. spinner 动画是靠什么机制持续更新的？
+#    它和主循环（queryLoop）是在同一个线程/任务里吗？

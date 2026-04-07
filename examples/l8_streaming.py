@@ -30,12 +30,19 @@ Layer 8 — Async Generator：Claude Code 的流式架构
   done                  → 整个任务结束
   error                 → 出错（但有时会被 withheld，等待恢复）
 
-运行前需要设置：
-  export DEEPSEEK_API_KEY=你的key
-  pip install openai
+运行方式：
+  无需 API Key（DRY_RUN 模式，观察完整事件序列）：
+    python examples/l8_streaming.py
 
-如果你暂时没有 API Key：
-  先读 docs/layers/l8-streaming.md，再去 services/api/claude.ts 搜 `first_chunk`。
+  有 API Key（真实 streaming）：
+    export DEEPSEEK_API_KEY=你的key
+    python examples/l8_streaming.py
+
+跑完后下一步：
+  1. 读 docs/paths/p2-core-loop.md
+  2. 看 docs/source-map.md 的“单轮查询主链路”
+  3. 搜 `stream_request_start`、`queryModelWithStreaming`、`first_chunk`
+  4. 先开 `query.ts` 和 `services/api/claude.ts`
 """
 
 import os
@@ -45,11 +52,76 @@ from typing import AsyncGenerator
 import asyncio
 from openai import AsyncOpenAI
 
+# ─────────────────────────────────────────────────────────────
+# DRY_RUN 模式：没有 API Key 时自动启用
+# 用预设事件序列走完完整的 async generator loop，
+# 让你不依赖真实 API 也能观察每一个 yield 事件的类型和顺序。
+# ─────────────────────────────────────────────────────────────
+DRY_RUN = not os.environ.get("DEEPSEEK_API_KEY", "").strip()
+
 client = AsyncOpenAI(
-    api_key=os.environ.get("DEEPSEEK_API_KEY", ""),
+    api_key=os.environ.get("DEEPSEEK_API_KEY", "no-key"),
     base_url="https://api.deepseek.com/v1",
 )
 MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+
+# ─────────────────────────────────────────────────────────────
+# Mock 响应序列（DRY_RUN 时使用）
+# 两轮：第 1 轮发起 bash 工具调用，第 2 轮给出最终文本（end_turn）
+# ─────────────────────────────────────────────────────────────
+_MOCK_CALL_ID = "mock_stream_001"
+_mock_stream_turn = 0
+
+_MOCK_STREAM_SCRIPT = [
+    {   # 轮 1：tool_use
+        "content": "我来查一下...",
+        "tool_calls": [{
+            "id": _MOCK_CALL_ID,
+            "type": "function",
+            "function": {"name": "bash",
+                         "arguments": json.dumps({"command": "echo '[mock stream] ls result'"})}
+        }]
+    },
+    {   # 轮 2：end_turn
+        "content": "[DRY_RUN] 看到了！这就是 async generator 的完整事件序列：\n"
+                   "  stream_request_start → text → tool_use → tool_result → stream_request_start → text → done\n"
+                   "每个 yield 都是一个独立事件，UI 层 async for 消费，可取消、可组合。\n"
+                   "现在去 query.ts 搜 'yield { type' 看真实的事件类型定义。",
+        "tool_calls": None
+    },
+]
+
+
+async def mock_api_call(messages):
+    """模拟 API 返回，结构与真实 response 一致。"""
+    global _mock_stream_turn
+    script = _MOCK_STREAM_SCRIPT[min(_mock_stream_turn, len(_MOCK_STREAM_SCRIPT) - 1)]
+    _mock_stream_turn += 1
+    await asyncio.sleep(0.05)  # 模拟网络延迟
+
+    class FakeFunction:
+        def __init__(self, name, arguments): self.name = name; self.arguments = arguments
+
+    class FakeToolCall:
+        def __init__(self, d):
+            self.id = d["id"]; self.type = d["type"]
+            self.function = FakeFunction(d["function"]["name"], d["function"]["arguments"])
+        def model_dump(self):
+            return {"id": self.id, "type": self.type,
+                    "function": {"name": self.function.name, "arguments": self.function.arguments}}
+
+    class FakeMessage:
+        def __init__(self, s):
+            self.content = s["content"]
+            self.tool_calls = [FakeToolCall(tc) for tc in s["tool_calls"]] if s.get("tool_calls") else None
+
+    class FakeChoice:
+        def __init__(self, s): self.message = FakeMessage(s)
+
+    class FakeResponse:
+        def __init__(self, s): self.choices = [FakeChoice(s)]
+
+    return FakeResponse(script)
 
 TOOLS = [{
     "type": "function",
@@ -146,13 +218,16 @@ async def query_loop(
         turn += 1
         yield event_stream_start(turn)
 
-        # 调用模型（真实代码会用流式 API，这里用普通调用简化）
+        # 调用模型（DRY_RUN 时用脚本响应，有 Key 时真实调用）
         try:
-            response = await client.chat.completions.create(
-                model=MODEL,
-                messages=messages,
-                tools=TOOLS,
-            )
+            if DRY_RUN:
+                response = await mock_api_call(messages)
+            else:
+                response = await client.chat.completions.create(
+                    model=MODEL,
+                    messages=messages,
+                    tools=TOOLS,
+                )
         except Exception as e:
             # 某些错误会被 withheld，等待上层决定是否恢复
             # 例如 max_output_tokens 错误会触发 token 升级重试
@@ -232,8 +307,13 @@ async def render_events(event_stream: AsyncGenerator[dict, None]):
 # REPL 入口
 # ─────────────────────────────────────────────────────────────
 async def main():
-    print("Layer 8 — Async Generator 流式架构演示  (输入 exit 退出)\n")
-    print("提示：试试 '列出当前目录文件，然后告诉我有几个 .py 文件'\n")
+    mode = "DRY_RUN（无需 API Key）" if DRY_RUN else "真实 API"
+    print(f"Layer 8 — Async Generator 流式架构演示  [{mode}]  (输入 exit 退出)\n")
+    if DRY_RUN:
+        print("提示：没有检测到 DEEPSEEK_API_KEY，自动进入 DRY_RUN 模式。")
+        print("      输入任意内容，观察完整的事件序列：stream_request_start → text → tool_use → tool_result → done\n")
+    else:
+        print("提示：试试 '列出当前目录文件，然后告诉我有几个 .py 文件'\n")
 
     messages = []
     abort = asyncio.Event()
@@ -263,3 +343,18 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+
+# ═══════════════════════════════════════════════════════════
+# 自检问题（跑完后回答，不要查代码）
+# ═══════════════════════════════════════════════════════════
+#
+# 1. yield* 和 yield 有什么区别？
+#    在 Claude Code 架构里，yield* 解决了什么问题？
+#    提示：想想子 agent 的事件如何传递给父 agent。
+#
+# 2. error 事件的 withheld=True 是什么意思？
+#    什么情况下错误会被"扣押"而不是立即暴露给调用方？
+#
+# 3. 如果用 Promise 代替 async generator 来实现 queryLoop，
+#    "用户随时可以 Ctrl+C 取消" 这个特性会怎么实现？会变得更复杂还是更简单？

@@ -6,6 +6,47 @@
 
 If you do not yet have the mainline in your head, go back to the [Learning Paths](./paths/README.en.md). If you are coming from an example, open the [example-to-source bridge](./example-source-bridge.en.md) first.
 
+## Request lifecycle at a glance
+
+```mermaid
+flowchart TD
+    A([User input]) --> B
+
+    subgraph S1[“Step 1 · Startup / mode routing”]
+        B[“main.tsx → setup.ts → entrypoints/”]
+    end
+
+    subgraph S2[“Step 2 · Enter query / queryLoop”]
+        C[“QueryEngine.ts → query.ts\nasync function* query()”]
+    end
+
+    subgraph S3[“Step 3 · Model call / output parsing”]
+        D[“services/api/claude.ts\nqueryModelWithStreaming”]
+    end
+
+    subgraph S4[“Step 4 · Tool execution”]
+        E[“bashPermissions.ts\nsemantic deny → rule match → ask user”]
+    end
+
+    subgraph S5[“Step 5 · tool_result flows back”]
+        F[“Append to message history\nsame queryLoop turn continues”]
+    end
+
+    subgraph S6[“Step 6 · State / UI update”]
+        G[“REPL.tsx + bootstrap/state.ts”]
+    end
+
+    B --> C
+    C --> D
+    D -->|”tool_use”| E
+    E --> F
+    F -->|”back to while true”| D
+    D -->|”end_turn”| G
+    G --> H{Next turn?}
+    H -->|”user continues”| C
+    H -->|”exit”| Z([Done])
+```
+
 ## How to use this map
 
 1. First locate which mainline step you are standing on.

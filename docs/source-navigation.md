@@ -4,6 +4,8 @@
 
 > `source-map` 解决“先读哪条调用链”，这份手册解决“在源码里怎么快速找到它”。
 
+如果你是从 `examples/` 或某篇 layer 文档过来的，这里就是例子和源码之间的落点：先把概念映射成符号，再去源码里验证边界和约束。
+
 ## 1. 最有用的搜索命令
 
 先在仓库根目录执行这些命令：
@@ -137,10 +139,13 @@ rg -n "bridgeMain|runHeadless|serve" claudecode_src/src/main.tsx claudecode_src/
 ## 4. 一条高效的源码阅读流程
 
 1. 先选一个问题，不要先选一个目录。
-2. 用 `docs/source-map.md` 找到对应调用链。
-3. 用这份手册里的搜索词定位函数和常量。
-4. 先读“入口函数 + 返回/退出点 + finally/cleanup”。
-5. 再去比较 `examples/` 的教学简化版和真实源码多了哪些约束。
+2. 如果你刚跑完 example，先回头确认它对应哪条 layer / 调用链。
+3. 用 `docs/source-map.md` 找到对应调用链。
+4. 用这份手册里的搜索词定位函数和常量。
+5. 先读“入口函数 + 返回/退出点 + finally/cleanup”。
+6. 再去比较 `examples/` 的教学简化版和真实源码多了哪些约束。
+
+如果你已经比较熟悉代码，可以把第 2 步和第 5 步压缩成一次快速回查，但不要省掉“例子 -> 符号 -> 边界”这条线。
 
 ## 5. 不要这样读
 
@@ -150,6 +155,7 @@ rg -n "bridgeMain|runHeadless|serve" claudecode_src/src/main.tsx claudecode_src/
 
 ## 6. 搭配阅读
 
+- [学习路径](./paths/README.md)
 - [源码导图](./source-map.md)
 - [Layer 深挖目录](./layers/README.md)
 - [学习练习册](./exercises.md)

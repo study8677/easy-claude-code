@@ -16,6 +16,12 @@ Layer 3 — 工具系统
 运行后请回答：
   - 为什么 schema 和 execute 必须分开？
   - 工具注册表在 Agent 系统里承担了什么角色？
+
+跑完后下一步：
+  1. 读 docs/paths/p1-first-hour.md 或 docs/layers/l3-tool-system.md
+  2. 看 docs/source-map.md 的“工具系统与权限路径”
+  3. 搜 `buildTool`、`getTools`、`canUseTool`
+  4. 先开 `Tool.ts` 和 `tools.ts`
 """
 
 import subprocess
@@ -229,3 +235,17 @@ if __name__ == "__main__":
 
     print("未知工具: fly_to_moon")
     print(dispatch("fly_to_moon", {}))
+
+
+# ═══════════════════════════════════════════════════════════
+# 自检问题（跑完后回答，不要查代码）
+# ═══════════════════════════════════════════════════════════
+#
+# 1. 工具的 schema（模型看到的）和 execute（运行时调用的）为什么要分开？
+#    如果合并成一个函数，会有什么问题？
+#
+# 2. dispatch() 找到工具后，调用的是工具对象的哪个方法？
+#    找不到工具时应该返回什么格式的结果让模型能理解？
+#
+# 3. Tool.ts、tools.ts、tools/BashTool/ 各自负责哪一层？
+#    提示：接口定义 / 注册表 / 具体实现。

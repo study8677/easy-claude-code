@@ -2,6 +2,12 @@
 
 [English](./README.en.md) | 中文
 
+如果你要按阶段学习，优先去 [学习路径页](../paths/README.md)。`docs/layers/` 更适合当参考资料和回查索引。
+
+如果你刚跑完 `examples/`，可以把这份目录当成“例子 -> 概念 -> 源码”的中间站：先对照 layer 文档建立直觉，再去 [源码导图](../source-map.md) 选调用链，最后用 [源码导航手册](../source-navigation.md) 找到具体符号。
+
+如果你已经在读源码，可以直接把这份目录当索引来回查；L10-L15 更偏向已经进入实现细节的读者。
+
 按顺序阅读：
 
 1. [L1 启动与入口](./l1-startup.md)
@@ -25,6 +31,7 @@
 
 建议搭配：
 
+- [学习路径](../paths/README.md)
 - [源码导图](../source-map.md)
 - [源码导航手册](../source-navigation.md)
 - [设计哲学](../../PHILOSOPHY.MD)

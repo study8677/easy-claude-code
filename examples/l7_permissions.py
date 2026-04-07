@@ -31,6 +31,12 @@ Layer 7 — 三层权限系统
 运行后请回答：
   - 为什么“每次都问用户”不是好的权限模型？
   - 数字 ID 相比字符串检查名有什么工程优势？
+
+跑完后下一步：
+  1. 读 docs/paths/p2-core-loop.md 或 docs/layers/l7-permissions.md
+  2. 看 docs/source-map.md 的“工具系统与权限路径”
+  3. 搜 `BASH_SECURITY_CHECK_IDS`、`canAutoApprove`、`canUseTool`
+  4. 先开 `bashPermissions.ts` 和 `bashSecurity.ts`
 """
 
 import re
@@ -49,8 +55,6 @@ class SecurityCheckId:
     FORK_BOMB = 10
     DANGEROUS_ZSH_MODULE = 20
     HEREDOC_INJECTION = 21
-
-@dataclass_helper = None  # 用普通类实现
 
 class SecurityResult:
     def __init__(self, allowed: bool, check_id: int | None = None, reason: str = ""):
@@ -260,3 +264,18 @@ if __name__ == "__main__":
         print(f"命令: {cmd}  ({desc})")
         result = can_execute(cmd, perm)
         print(f"结果: {'✓ 执行' if result else '✗ 拒绝'}\n")
+
+
+# ═══════════════════════════════════════════════════════════
+# 自检问题（跑完后回答，不要查代码）
+# ═══════════════════════════════════════════════════════════
+#
+# 1. 三层权限的执行顺序是什么？
+#    第一层和第三层分别在哪个源码文件里？
+#
+# 2. BASH_SECURITY_CHECK_IDS 用数字 ID 而不是字符串命名检查器，
+#    在工程上有什么好处？
+#    提示：想想如果 ID 是字符串，重命名检查器会怎样影响历史记录。
+#
+# 3. 一条命令通过了 bashSecurity 的 23 个检查后，是否一定会被执行？
+#    还差哪一步？

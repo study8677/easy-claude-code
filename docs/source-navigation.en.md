@@ -4,6 +4,8 @@
 
 > The `source-map` explains which call chains to study. This guide explains how to find them quickly in the code.
 
+If you arrived here from `examples/` or a layer note, this is the handoff point between intuition and implementation: first map the concept to symbols, then verify the boundary and constraints in source.
+
 ## 1. The Most Useful Search Commands
 
 Run these from the repo root:
@@ -137,10 +139,13 @@ If you only remember one tool, remember `rg -n`. This codebase is much easier to
 ## 4. An Efficient Reading Workflow
 
 1. Start with one question, not one directory.
-2. Use `docs/source-map.en.md` to find the relevant call chain.
-3. Use the search terms in this guide to locate the functions and constants.
-4. Read the entrypoint, the return or exit path, and the cleanup or finally logic first.
-5. Then compare the teaching demo in `examples/` with the real source and note the extra constraints.
+2. If you just ran an example, first confirm which layer note and call chain it corresponds to.
+3. Use `docs/source-map.en.md` to find the relevant call chain.
+4. Use the search terms in this guide to locate the functions and constants.
+5. Read the entrypoint, the return or exit path, and the cleanup or finally logic first.
+6. Then compare the teaching demo in `examples/` with the real source and note the extra constraints.
+
+If you already know the repo well, you can compress steps 2 and 5 into a quick check, but do not skip the “example -> symbol -> boundary” path entirely.
 
 ## 5. Avoid These Reading Mistakes
 
@@ -150,6 +155,7 @@ If you only remember one tool, remember `rg -n`. This codebase is much easier to
 
 ## 6. Read Alongside
 
+- [Learning Paths](./paths/README.en.md)
 - [Source Map](./source-map.en.md)
 - [Layer Deep-Dive Index](./layers/README.en.md)
 - [Study Exercises](./exercises.en.md)

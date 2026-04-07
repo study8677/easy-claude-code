@@ -6,12 +6,53 @@
 
 如果你还没抓稳主线，先回到 [学习路径页](./paths/README.md)。如果你是从 example 过来的，先看 [example 到源码的桥接页](./example-source-bridge.md)。
 
+## 一次请求的完整生命周期
+
+```mermaid
+flowchart TD
+    A([用户输入]) --> B
+
+    subgraph S1[“Step 1 · 启动 / 模式分流”]
+        B[“main.tsx → setup.ts → entrypoints/”]
+    end
+
+    subgraph S2[“Step 2 · 进入 query / queryLoop”]
+        C[“QueryEngine.ts → query.ts\nasync function* query()”]
+    end
+
+    subgraph S3[“Step 3 · 调用模型 / 解析输出”]
+        D[“services/api/claude.ts\nqueryModelWithStreaming”]
+    end
+
+    subgraph S4[“Step 4 · 工具执行”]
+        E[“bashPermissions.ts\n语义拒绝 → 规则匹配 → 询问用户”]
+    end
+
+    subgraph S5[“Step 5 · tool_result 回流”]
+        F[“追回消息历史\n同一轮 queryLoop 继续”]
+    end
+
+    subgraph S6[“Step 6 · 状态 / UI 更新”]
+        G[“REPL.tsx + bootstrap/state.ts”]
+    end
+
+    B --> C
+    C --> D
+    D -->|”tool_use”| E
+    E --> F
+    F -->|”继续 while true”| D
+    D -->|”end_turn”| G
+    G --> H{下一轮？}
+    H -->|”用户继续输入”| C
+    H -->|”退出”| Z([结束])
+```
+
 ## 怎么使用这份导图
 
 1. 先定位你现在站在主线的哪一步。
 2. 对照该步骤的输入 / 输出，确认这一步到底完成了什么。
 3. 只打开 1 到 2 个核心文件，并先搜 2 到 4 个 symbol。
-4. 沿着“下一步流向”继续，不要一开始横向散读所有子系统。
+4. 沿着”下一步流向”继续，不要一开始横向散读所有子系统。
 
 <a id="step-1-startup-routing"></a>
 ## Step 1 — 启动 / 模式分流

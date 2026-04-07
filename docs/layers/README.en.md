@@ -2,6 +2,12 @@
 
 [中文](./README.md) | English
 
+If you want a staged course, start with the [Learning Paths](../paths/README.en.md). `docs/layers/` works better as reference material and a lookup index.
+
+If you just finished `examples/`, treat this index as the bridge from “example -> concept -> source”: first use a layer note to build intuition, then open the [Source Map](../source-map.en.md) to choose a call chain, and finally use the [Source Navigation Guide](../source-navigation.en.md) to find the exact symbols.
+
+If you are already in the source tree, you can use this index as a lookup table; L10-L15 are aimed more at readers who are already inside the implementation details.
+
 Read in order:
 
 1. [L1 Startup And Entry Points](./l1-startup.en.md)
@@ -25,6 +31,7 @@ Advanced deep dives:
 
 Read alongside:
 
+- [Learning Paths](../paths/README.en.md)
 - [Source Map](../source-map.en.md)
 - [Source Navigation Guide](../source-navigation.en.md)
 - [Design Philosophy](../../PHILOSOPHY_EN.MD)

@@ -4,7 +4,7 @@
 
 ## 1. Can I use this repo if I do not know TypeScript well?
 
-Yes. Start with `examples/` for intuition, then read `docs/layers/`. The goal is not to master syntax first, but to understand what each subsystem is solving.
+Yes. Start with `examples/` for intuition, then read `docs/layers/`, and use `docs/source-map.en.md` plus `docs/source-navigation.en.md` to connect that intuition to source. The goal is not to master syntax first, but to understand what each subsystem is solving.
 
 ## 2. What can I still learn without an API key?
 
@@ -16,7 +16,7 @@ Because Claude Code was not designed to be learned linearly by directory order. 
 
 ## 4. Should I read QueryEngine first or query.ts first?
 
-If you are new, read `query.ts` first to understand the loop. Then move to `QueryEngine.ts` to understand how system prompts, skills, plugins, and slash commands are staged before the loop begins.
+If you are new, read `query.ts` first to understand the loop. Then move to `QueryEngine.ts` to understand how system prompts, skills, plugins, and slash commands are staged before the loop begins. The most reliable path is still: example -> layer -> source map -> source navigation.
 
 ## 5. Why does the repo have both 9 layers and L10-L15?
 
@@ -24,7 +24,7 @@ The first 9 layers are the main course with runnable examples. L10-L15 are sourc
 
 ## 6. What is the best reading workflow?
 
-Run one example, read the matching layer note, then search the listed symbols in `claudecode_src/src/`. Do not start by reading the source tree from top to bottom. If you get lost in the source, keep the [Source Navigation Guide](./source-navigation.en.md) open next to it.
+Start with the [Learning Paths](./paths/README.en.md) and move through `P1 -> P2 -> P3 -> P4`. At each stage, run the matching example, read the matching layer notes, check the [Source Map](./source-map.en.md), and search the listed symbols in `claudecode_src/src/`. Do not start by reading the source tree from top to bottom. If you get lost in the source, keep the [Source Navigation Guide](./source-navigation.en.md) open next to it.
 
 ## 7. What should I do if I want to move from "I kind of get it" to real source analysis?
 

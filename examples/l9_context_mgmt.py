@@ -33,6 +33,12 @@ Layer 9 — Context Window 管理 & Auto-Compact
 运行后请回答：
   - auto-compact 和 memory index 分别解决什么问题？
   - 为什么 prompt cache 命中率会反过来影响架构？
+
+跑完后下一步：
+  1. 读 docs/layers/l9-context.md
+  2. 看 docs/source-map.md 的“Context / Prompt Cache / Memory 路径”
+  3. 搜 `SYSTEM_PROMPT_DYNAMIC_BOUNDARY`、`ENTRYPOINT_NAME`、`buildMemoryLines`、`extractMemories`
+  4. 先开 `constants/prompts.ts` 和 `utils/context.ts`
 """
 
 import os
@@ -269,3 +275,17 @@ if __name__ == "__main__":
     print()
     print("这就是为什么 Claude Code 的响应速度比你预期的快——")
     print("那几万 token 的系统 Prompt 大多数情况下直接走缓存。")
+
+
+# ═══════════════════════════════════════════════════════════
+# 自检问题（跑完后回答，不要查代码）
+# ═══════════════════════════════════════════════════════════
+#
+# 1. SYSTEM_PROMPT_DYNAMIC_BOUNDARY 把 system prompt 分成哪两部分？
+#    为什么这个边界对 prompt cache 命中率很关键？
+#
+# 2. context 超限时，Claude Code 会优先截断哪些消息？
+#    截断时最不能丢的是哪些内容？
+#
+# 3. prompt cache 能命中的前提条件是什么？
+#    如果每轮 system prompt 末尾都追加当前时间，缓存会怎样？

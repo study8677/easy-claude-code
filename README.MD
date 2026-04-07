@@ -36,6 +36,7 @@
 补充材料：
 
 - [PHILOSOPHY.MD](./PHILOSOPHY.MD)：设计哲学与工程权衡总结
+- [docs/symbol-cheatsheet.md](./docs/symbol-cheatsheet.md)：关键符号速查卡（文件名 + 行号 + 一句话说明）
 - [docs/source-navigation.md](./docs/source-navigation.md)：源码符号搜索手册
 - [docs/exercises.md](./docs/exercises.md)：练习册
 - [docs/faq.md](./docs/faq.md)：常见问题
@@ -53,6 +54,7 @@
 | `l7_permissions.py` | 工具执行前的关口 | 权限系统怎样在工具真正执行前介入 |
 | `l8_streaming.py` | 主线的贯穿方式 | 为什么核心抽象更像 async generator / 事件流 |
 | `l9_context_mgmt.py` | 多轮持续运行 | context 管理如何保护主线继续前进而不失控 |
+| `l10_mcp.py` | 主线外扩展 | MCP 协议如何把外部工具注入 Claude Code 的工具注册表 |
 
 ## 5 分钟开始
 
